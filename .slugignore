@@ -1,0 +1,11 @@
+*.psd
+test/
+features/
+doc/
+log/
+spec/
+tmp/
+www/
+ignore/
+*.sublime-project
+*.sublime-workspace

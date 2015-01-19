@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '4.1.4'
+gem 'rails', '4.2'
 # Use postgresql as the database for Active Record
 gem 'pg'
 # Use SCSS for stylesheets
@@ -48,3 +48,5 @@ gem 'omniauth'
 gem 'omniauth-facebook'
 gem 'validates_formatting_of'
 gem 'tzinfo-data'
+gem 'twilio-ruby'
+gem 'thin'
