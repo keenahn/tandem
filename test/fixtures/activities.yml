@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  language: MyString
+  present_indicative: MyString
+  present_particple: MyString
+  past_participle: MyString
+  noun: MyString
+  short_noun: MyString
+
+two:
+  language: MyString
+  present_indicative: MyString
+  present_particple: MyString
+  past_participle: MyString
+  noun: MyString
+  short_noun: MyString
