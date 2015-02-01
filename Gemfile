@@ -2,7 +2,6 @@ ruby "2.1.5"
 
 source "https://rubygems.org"
 
-
 # Bundle edge Rails instead: gem "rails", github: "rails/rails"
 gem "rails", "4.2"
 # Use postgresql as the database for Active Record
@@ -59,6 +58,15 @@ gem "haml-rails", "~> 0.8" # for haml generators
 gem "haml"
 
 
+gem "memcachier"                  # memcache service
+gem "kgio"                        # performance boost for dalli
+gem "dalli"                       # memcached
+
+gem "rails_12factor", group: :production   # https://devcenter.heroku.com/articles/ruby-support#injected-plugins
+
+gem "multi_fetch_fragments" # for parallel fetching of cached items from memcache http://ninjasandrobots.com/rails-faster-partial-rendering-and-caching
+
+
 group :development do
   gem "awesome_print"
   gem "pry" # better console
@@ -71,4 +79,5 @@ group :development do
   gem "htmlentities"
   gem "smarter_csv"
 end
+
 

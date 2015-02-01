@@ -26,9 +26,9 @@ Rails.application.configure do
 
 
   # Caching
-  # config.cache_store = :dalli_store, {expires_in: 1.day, compress: true }
-  # Dalli.logger = Logger.new("#{Rails.root}/log/#{Rails.env}_cache.log")
-  # Dalli.logger.level = Logger::DEBUG
+  config.cache_store = :dalli_store, {expires_in: 1.day, compress: true }
+  Dalli.logger = Logger.new("#{Rails.root}/log/#{Rails.env}_cache.log")
+  Dalli.logger.level = Logger::DEBUG
 
 
   config.action_mailer.delivery_method = :test # :smtp
@@ -45,7 +45,7 @@ Rails.application.configure do
   # Only use best-standards-support built into browsers
   config.action_dispatch.best_standards_support = :builtin
 
-  config.serve_static_assets = true
+  config.serve_static_files = true
 
   # Do not compress assets
   config.assets.compress = false
@@ -61,7 +61,7 @@ Rails.application.configure do
   # Debug mode disables concatenation and preprocessing of assets.
   # This option may cause significant delays in view rendering with a large
   # number of complex assets.
-  config.assets.debug = true
+  # config.assets.debug = true
 
   # Adds additional error checking when serving assets at runtime.
   # Checks for improperly declared sprockets dependencies.
