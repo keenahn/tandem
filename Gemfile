@@ -52,3 +52,23 @@ gem "validates_formatting_of"
 gem "tzinfo-data"
 gem "twilio-ruby"
 gem "thin"
+
+gem "dotenv-rails", :groups => [:development, :test] # for the .env file
+
+gem "haml-rails", "~> 0.8" # for haml generators
+gem "haml"
+
+
+group :development do
+  gem "awesome_print"
+  gem "pry" # better console
+  gem "pry-rails" #rails loader for pry
+  gem "colorize"
+  gem "hirb"
+  gem "byebug"
+  gem "pry-byebug"
+  gem "pry-stack_explorer"
+  gem "htmlentities"
+  gem "smarter_csv"
+end
+
