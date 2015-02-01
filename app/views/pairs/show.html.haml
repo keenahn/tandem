@@ -1,0 +1,15 @@
+%p#notice= notice
+
+%p
+  %b Group:
+  = @pair.group
+%p
+  %b Member 1:
+  = @pair.member_1
+%p
+  %b Member 2:
+  = @pair.member_2
+
+= link_to 'Edit', edit_pair_path(@pair)
+\|
+= link_to 'Back', pairs_path
