@@ -74,6 +74,14 @@ Rails.application.configure do
   # ActiveSupport::Dependencies.autoload_paths << File::join( Rails.root, 'lib')
   # ActiveSupport::Dependencies.explicitly_unloadable_constants << 'Content'
 
+  # Enable serving of images, stylesheets, and JavaScripts from an asset server.
+  config.middleware.insert_before 0, "Rack::Cors" do
+    allow do
+      origins "http://beta.tandem.com"
+      resource '*', :headers => :any, :methods => [:get, :options]
+    end
+  end
+
 end
 
 silence_warnings do

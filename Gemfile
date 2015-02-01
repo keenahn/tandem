@@ -81,3 +81,7 @@ group :development do
 end
 
 
+group :development, :staging do
+  gem "rack-cors", :require => "rack/cors"
+end
+
