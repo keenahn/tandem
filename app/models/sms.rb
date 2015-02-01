@@ -81,7 +81,7 @@ class Sms < ActiveRecord::Base
       #TODO: orgs always have SMS enabled
       #check owners of all fundraisers...
       #urgh
-      if o.fundraisers.where(:owner_id => to_u.id).empty?
+      if o.fundraisers.where(owner_id: to_u.id).empty?
         errors[:base] << "The recipient is not a organization member"
         return false
       end

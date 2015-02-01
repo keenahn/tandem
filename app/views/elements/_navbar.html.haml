@@ -1,7 +1,7 @@
-%nav.navbar.navbar-default{:role => "navigation"}
+%nav.navbar.navbar-default{role: "navigation"}
   / Brand and toggle get grouped for better mobile display
   .navbar-header
-    %button.navbar-toggle{"data-target" => "#navbar-collapse-1", "data-toggle" => "collapse", :type => "button"}
+    %button.navbar-toggle{"data-target" => "#navbar-collapse-1", "data-toggle" => "collapse", type: "button"}
       %span.sr-only Toggle navigation
       %span.icon-bar
       %span.icon-bar
@@ -14,7 +14,7 @@
       - if defined?(Devise)
         - if user_signed_in?
           %li.dropdown
-            %a.dropdown-toggle{"data-toggle" => "dropdown", :href => "#"}
+            %a.dropdown-toggle{"data-toggle" => "dropdown", href: "#"}
               Account
               %b.caret
             %ul.dropdown-menu

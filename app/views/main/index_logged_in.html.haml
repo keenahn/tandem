@@ -8,8 +8,8 @@
           %th= Group.human_attribute_name(:name)
           %th= Group.human_attribute_name(:description)
           %th= Group.human_attribute_name(:created_at)
-          %th= t '.actions', :default => t("helpers.actions")
+          %th= t '.actions', default: t("helpers.actions")
       %tbody
         = render partial: "groups/row", collection: current_user.groups.ordered, as: :group, cache: true
-  %p= link_to t('.new', :default => t("helpers.links.new")), new_group_path, :class => 'btn btn-primary'
+  %p= link_to t('.new', default: t("helpers.links.new")), new_group_path, class: 'btn btn-primary'
 
