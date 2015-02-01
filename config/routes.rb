@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  resources :pairs
+
   get 'main/index'
 
   resources :groups
