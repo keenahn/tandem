@@ -1,4 +1,4 @@
-ruby "2.1.5"
+ruby "2.2.0"
 
 source "https://rubygems.org"
 
@@ -80,8 +80,17 @@ group :development do
   gem "smarter_csv"
 end
 
+group :test do
+
+  gem "shoulda-matchers"
+end
 
 group :development, :staging do
   gem "rack-cors", :require => "rack/cors"
 end
 
+group :development, :test do
+  gem "rspec-rails", "~> 2.0"
+  gem "factory_girl_rails"
+  gem "faker"
+end
