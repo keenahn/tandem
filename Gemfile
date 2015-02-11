@@ -81,7 +81,6 @@ group :development do
 end
 
 group :test do
-
   gem "shoulda-matchers"
 end
 
@@ -90,7 +89,8 @@ group :development, :staging do
 end
 
 group :development, :test do
-  gem "rspec-rails", "~> 2.0"
+  gem "rspec-rails" # , "~> 2.0"
   gem "factory_girl_rails"
   gem "faker"
+  gem "database_cleaner"
 end
