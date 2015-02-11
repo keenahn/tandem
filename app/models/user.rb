@@ -4,6 +4,9 @@ class User < ActiveRecord::Base
   devise :database_authenticatable, :registerable, :recoverable, :rememberable, :trackable, :validatable
   attr_accessor :login
 
+  validates :email, presence: true
+  validates :password, presence: true
+
   devise authentication_keys: [:login]
 
   #->Prelang (user_login:devise/username_login_support)
