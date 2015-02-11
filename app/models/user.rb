@@ -7,6 +7,8 @@ class User < ActiveRecord::Base
   validates :email, presence: true
   validates :password, presence: true
 
+  has_many :groups
+
   devise authentication_keys: [:login]
 
   #->Prelang (user_login:devise/username_login_support)
@@ -19,13 +21,8 @@ class User < ActiveRecord::Base
     end
   end
 
-
-  has_many :groups
-
   def has_groups?
     groups.count > 0
   end
-
-
 
 end
