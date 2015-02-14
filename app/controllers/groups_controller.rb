@@ -4,11 +4,15 @@ class GroupsController < ApplicationController
   #->Prelang (scaffolding:rails/scope_to_user)
   before_filter :require_user_signed_in, only: [:new, :edit, :create, :update, :destroy]
   before_action :set_group, only: [:show, :edit, :update, :destroy]
+  include Pundit
+
+  rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
+
 
   # GET /groups
   # GET /groups.json
   def index
-    @groups = Group.all
+    @groups = policy_scope(Group)
   end
 
   # GET /groups/1
@@ -23,6 +27,8 @@ class GroupsController < ApplicationController
 
   # GET /groups/1/edit
   def edit
+    authorize @group
+    # return redirect_to root_path unless current_user && current_user.id ==
   end
 
   # POST /groups
@@ -76,6 +82,11 @@ class GroupsController < ApplicationController
   # Never trust parameters from the scary internet, only allow the white list through.
   def group_params
     params.require(:group).permit(:user_id, :name, :description)
+  end
+
+  def user_not_authorized
+    flash[:alert] = "You are not authorized to perform this action."
+    redirect_to(request.referrer || root_path)
   end
 
 end
