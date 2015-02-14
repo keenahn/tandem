@@ -1,4 +1,6 @@
+# Sessions controller from Devise
 class Users::SessionsController < Devise::SessionsController
+
   include ApplicationHelper
 
   def create
@@ -8,4 +10,5 @@ class Users::SessionsController < Devise::SessionsController
   def new
     super
   end
+
 end

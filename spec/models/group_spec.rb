@@ -6,7 +6,7 @@ describe Group do
   it { should have_many :pairs }
 
   it '.to_s' do
-    g = Group.new(name: Faker::Company.name)
+    g = FactoryGirl.build(:group)
     expect(g.name).to eq(g.name)
   end
 

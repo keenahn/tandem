@@ -1,5 +1,5 @@
 = cache "user-#{current_user.updated_at.to_i}" do
-  - if current_user.has_groups?
+  - if current_user.groups?
     %h1 Your Groups
     %table.table.table-striped
       %thead

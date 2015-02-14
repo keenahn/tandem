@@ -1,4 +1,6 @@
+# Controller for manipulating Pairs
 class PairsController < ApplicationController
+
   before_action :set_pair, only: [:show, :edit, :update, :destroy]
 
   # GET /pairs
@@ -28,7 +30,7 @@ class PairsController < ApplicationController
 
     respond_to do |format|
       if @pair.save
-        format.html { redirect_to @pair, notice: 'Pair was successfully created.' }
+        format.html { redirect_to @pair, notice: "Pair was successfully created." }
         format.json { render :show, status: :created, location: @pair }
       else
         format.html { render :new }
@@ -42,7 +44,7 @@ class PairsController < ApplicationController
   def update
     respond_to do |format|
       if @pair.update(pair_params)
-        format.html { redirect_to @pair, notice: 'Pair was successfully updated.' }
+        format.html { redirect_to @pair, notice: "Pair was successfully updated." }
         format.json { render :show, status: :ok, location: @pair }
       else
         format.html { render :edit }
@@ -56,12 +58,13 @@ class PairsController < ApplicationController
   def destroy
     @pair.destroy
     respond_to do |format|
-      format.html { redirect_to pairs_url, notice: 'Pair was successfully destroyed.' }
+      format.html { redirect_to pairs_url, notice: "Pair was successfully destroyed." }
       format.json { head :no_content }
     end
   end
 
   private
+
   # Use callbacks to share common setup or constraints between actions.
   def set_pair
     @pair = Pair.find(params[:id])
@@ -72,7 +75,5 @@ class PairsController < ApplicationController
     # params[:pair]
     params.require(:pair).permit(:group_id, :member_1_id, :member_2_id)
   end
-
-
 
 end

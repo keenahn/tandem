@@ -1,4 +1,6 @@
+# The main controller for displaying pages on the site
 class MainController < ApplicationController
+
   def index
     if current_user
       render "main/index_logged_in"
@@ -6,4 +8,5 @@ class MainController < ApplicationController
       render
     end
   end
+
 end

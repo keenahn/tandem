@@ -1,4 +1,6 @@
+# Registrations controller from Devise
 class Users::RegistrationsController < Devise::RegistrationsController
+
   include ApplicationHelper
 
   def create
@@ -12,4 +14,5 @@ class Users::RegistrationsController < Devise::RegistrationsController
   def edit
     super
   end
+
 end

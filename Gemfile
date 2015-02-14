@@ -94,3 +94,6 @@ group :development, :test do
   gem "faker"
   gem "database_cleaner"
 end
+
+
+gem "pundit" # for a lightweight permissions system
