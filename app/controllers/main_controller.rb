@@ -3,7 +3,7 @@ class MainController < ApplicationController
 
   def index
     if current_user
-      render "main/index_logged_in"
+      return redirect_to groups_path
     else
       render
     end
