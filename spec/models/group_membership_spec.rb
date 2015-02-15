@@ -1,5 +1,7 @@
-require 'rails_helper'
+require "spec_helper"
 
-RSpec.describe GroupMembership, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+describe GroupMembership do
+
+  it "TODO: pending"
+
 end

@@ -9,7 +9,7 @@ class Member < ActiveRecord::Base
 
   # Returns AR object of pairs the member belongs to
   def pairs
-    Pair.where("member_1_id = ? OR member_2_id = ?", id, id)
+    Pair.with_member_id(id)
   end
 
   def to_s
