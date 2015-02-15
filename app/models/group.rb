@@ -1,9 +1,10 @@
 # A grouping of members and pairs
 class Group < ActiveRecord::Base
 
-  belongs_to :user, touch: true
-  has_and_belongs_to_many :members
-  has_many :pairs
+  belongs_to :owner, touch: true, class_name: "User"
+  has_many :members, through: :group_memberships, dependent: :destroy
+  has_many :group_memberships, dependent: :destroy
+  has_many :pairs, dependent: :destroy
 
   scope :ordered, -> { order(:name) }
 

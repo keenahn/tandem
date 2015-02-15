@@ -164,7 +164,9 @@ GEM
       oauth2 (~> 1.0)
       omniauth (~> 1.2)
     orm_adapter (0.5.0)
+    people (0.2.1)
     pg (0.18.1)
+    phone (1.2.3)
     pry (0.10.1)
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
@@ -315,7 +317,9 @@ DEPENDENCIES
   multi_fetch_fragments
   omniauth
   omniauth-facebook
+  people
   pg
+  phone
   pry
   pry-byebug
   pry-rails

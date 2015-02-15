@@ -95,5 +95,7 @@ group :development, :test do
   gem "database_cleaner"
 end
 
-
 gem "pundit" # for a lightweight permissions system
+gem "phone"  # for parsing and validating phone numbers! And area code detection
+gem "people" # for parsing names
+

@@ -9,7 +9,7 @@ class User < ActiveRecord::Base
   validates :email, presence: true
   validates :password, presence: true
 
-  has_many :groups
+  has_many :groups, foreign_key: :owner_id, dependent: :destroy
 
   devise authentication_keys: [:login]
 
