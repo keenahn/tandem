@@ -1,7 +1,6 @@
 require "spec_helper"
 
 describe GroupsController do
-
   describe "Not Logged in" do
     let(:g) { FactoryGirl.create(:group) }
 
@@ -32,7 +31,6 @@ describe GroupsController do
     login_user
 
     describe "has permission" do
-
       let(:g) { FactoryGirl.create(:group, owner_id: subject.current_user.id) }
 
       it "GET new" do
@@ -78,7 +76,6 @@ describe GroupsController do
     end
 
     describe "does not have permission" do
-
       let(:g) { FactoryGirl.create(:group, owner_id: 9999999) }
 
       it "should not get edit" do
@@ -104,5 +101,4 @@ describe GroupsController do
       end
     end
   end
-
 end

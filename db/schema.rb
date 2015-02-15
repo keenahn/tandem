@@ -11,21 +11,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150215020658) do
+ActiveRecord::Schema.define(version: 20150215201944) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
-
-  create_table "activities", force: :cascade do |t|
-    t.string   "language",           limit: 255
-    t.string   "present_indicative", limit: 255
-    t.string   "present_particple",  limit: 255
-    t.string   "past_participle",    limit: 255
-    t.string   "noun",               limit: 255
-    t.string   "short_noun",         limit: 255
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
 
   create_table "group_memberships", force: :cascade do |t|
     t.integer  "group_id",   null: false
