@@ -1,4 +1,7 @@
 # Controller for manipulating Pairs
+# TODO: clean up, remove most of these actions
+# TODO: clean up controller spec too
+# TODO: change all magic strings to live in translation dictionaries
 class PairsController < ApplicationController
 
   before_action :set_pair, only: [:show, :edit, :update, :destroy]

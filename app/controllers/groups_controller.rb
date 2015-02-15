@@ -1,10 +1,11 @@
 # Controller for manipulating Groups
+# TODO: change all magic strings to live in translation dictionaries
 class GroupsController < ApplicationController
 
+  include Pundit
   #->Prelang (scaffolding:rails/scope_to_user)
   before_filter :require_user_signed_in, only: [:index, :new, :edit, :create, :update, :destroy, :show]
   before_action :set_group, only: [:show, :edit, :update, :destroy]
-  include Pundit
 
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 

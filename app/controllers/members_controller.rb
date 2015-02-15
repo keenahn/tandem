@@ -1,4 +1,7 @@
 # Controller for manipulating members
+# TODO: clean up, remove most of these actions
+# TODO: clean up controller spec too
+# TODO: change all magic strings to live in translation dictionaries
 class MembersController < ApplicationController
 
   before_action :set_member, only: [:show, :edit, :update, :destroy]
