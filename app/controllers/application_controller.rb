@@ -7,6 +7,8 @@ class ApplicationController < ActionController::Base
 
   before_filter :configure_permitted_parameters, if: :devise_controller?
 
+  before_action :set_locale
+
   protected
 
   #->Prelang (user_login:devise)
@@ -33,5 +35,10 @@ class ApplicationController < ActionController::Base
 
     redirect_to fallback_redirect, flash: { error: "You must be signed in to view this page." }
   end
+
+  def set_locale
+    I18n.locale = params[:locale] || I18n.default_locale
+  end
+
 
 end

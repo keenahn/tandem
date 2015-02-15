@@ -21,13 +21,15 @@ module Tandem
     # config.i18n.default_locale = :de
 
 
+    # load subdirectories too
+    config.i18n.load_path += Dir[Rails.root.join('config', 'locales', '**', '*.{rb,yml}')]
+
     # config.generators do |g|
     #   g.orm             :active_record
     #   g.template_engine :haml
     #   g.test_framework  :test_unit, fixture: true
     # end
 
-
-
   end
+
 end
