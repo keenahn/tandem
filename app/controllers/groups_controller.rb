@@ -2,7 +2,7 @@
 class GroupsController < ApplicationController
 
   #->Prelang (scaffolding:rails/scope_to_user)
-  before_filter :require_user_signed_in, only: [:new, :edit, :create, :update, :destroy]
+  before_filter :require_user_signed_in, only: [:index, :new, :edit, :create, :update, :destroy, :show]
   before_action :set_group, only: [:show, :edit, :update, :destroy]
   include Pundit
 
@@ -18,6 +18,7 @@ class GroupsController < ApplicationController
   # GET /groups/1
   # GET /groups/1.json
   def show
+    authorize @group
   end
 
   # GET /groups/new
@@ -35,7 +36,7 @@ class GroupsController < ApplicationController
   # POST /groups.json
   def create
     @group = Group.new(group_params)
-    @group.user = current_user
+    @group.owner = current_user
 
     respond_to do |format|
       if @group.save
@@ -51,6 +52,7 @@ class GroupsController < ApplicationController
   # PATCH/PUT /groups/1
   # PATCH/PUT /groups/1.json
   def update
+    authorize @group
     respond_to do |format|
       if @group.update(group_params)
         format.html { redirect_to @group, notice: "Group was successfully updated." }
@@ -65,6 +67,7 @@ class GroupsController < ApplicationController
   # DELETE /groups/1
   # DELETE /groups/1.json
   def destroy
+    authorize @group
     @group.destroy
     respond_to do |format|
       format.html { redirect_to groups_url, notice: "Group was successfully destroyed." }
