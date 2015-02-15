@@ -8,7 +8,6 @@ class GroupsController < ApplicationController
 
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
-
   # GET /groups
   # GET /groups.json
   def index

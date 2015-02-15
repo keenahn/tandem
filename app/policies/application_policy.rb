@@ -1,4 +1,6 @@
+# Base class used for Pundit
 class ApplicationPolicy
+
   attr_reader :user, :record
 
   def initialize(user, record)
@@ -11,7 +13,7 @@ class ApplicationPolicy
   end
 
   def show?
-    scope.where(:id => record.id).exists?
+    scope.where(id: record.id).exists?
   end
 
   def create?
@@ -38,7 +40,9 @@ class ApplicationPolicy
     Pundit.policy_scope!(user, record.class)
   end
 
+  # Internal Scope class for Pundit that other policy scopes can inherit from
   class Scope
+
     attr_reader :user, :scope
 
     def initialize(user, scope)
@@ -49,6 +53,7 @@ class ApplicationPolicy
     def resolve
       scope
     end
-  end
-end
 
+  end
+
+end

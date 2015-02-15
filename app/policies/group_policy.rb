@@ -1,5 +1,7 @@
+# Policy for manipulating groups
 class GroupPolicy < ApplicationPolicy
 
+  # Scope for groups
   class Scope < Scope
 
     def resolve
@@ -10,18 +12,24 @@ class GroupPolicy < ApplicationPolicy
   end
 
   def edit?
-    record.owner_id == user.id
+    owns?
   end
 
   def show?
-    record.owner_id == user.id
+    owns?
   end
 
   def update?
-    record.owner_id == user.id
+    owns?
   end
 
   def destroy?
+    owns?
+  end
+
+  private
+
+  def owns?
     record.owner_id == user.id
   end
 

@@ -6,7 +6,6 @@ class Member < ActiveRecord::Base
 
   after_destroy :destroy_pairs
 
-
   # Returns AR object of pairs the member belongs to
   def pairs
     Pair.with_member_id(id)
