@@ -51,6 +51,8 @@ tramp
 
 Gemfile.lock.new
 
+coverage
+
 /test/casper/attachments/*
 /test/casper/screens/*
 /test/casper/texts/*
