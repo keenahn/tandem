@@ -9,3 +9,8 @@ www/
 ignore/
 *.sublime-project
 *.sublime-workspace
+.rubocop.yml
+.ruby-version
+.rspec
+prelang-init
+README.rdoc
