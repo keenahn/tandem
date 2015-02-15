@@ -2,82 +2,52 @@ ruby "2.2.0"
 
 source "https://rubygems.org"
 
-# Bundle edge Rails instead: gem "rails", github: "rails/rails"
-gem "rails", "4.2"
-# Use postgresql as the database for Active Record
-gem "pg"
-# Use SCSS for stylesheets
-gem "sass-rails", "~> 4.0.3"
-# Use Uglifier as compressor for JavaScript assets
-gem "uglifier", ">= 1.3.0"
-# Use CoffeeScript for .js.coffee assets and views
-gem "coffee-rails", "~> 4.0.0"
-# See https://github.com/sstephenson/execjs#readme for more supported runtimes
-# gem "therubyracer",  platforms: :ruby
+gem "people", github: "keenahn/people" # for parsing names. Using my fork because the old one is not maintained
 
-# Use jquery as the JavaScript library
-gem "jquery-rails"
-# Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
-gem "turbolinks"
-# Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
-gem "jbuilder", "~> 2.0"
-# bundle exec rake doc:rails generates the API under doc/api.
-gem "sdoc", "~> 0.4.0",          group: :doc
+gem "rails", "4.2"                # rails! For edge Rails instead, use: gem "rails", github: "rails/rails"
 
-# # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
-# gem "spring",        group: :development
-
-# Use ActiveModel has_secure_password
-# gem "bcrypt", "~> 3.1.7"
-
-# Use unicorn as the app server
-# gem "unicorn"
-
-# Use Capistrano for deployment
-# gem "capistrano-rails", group: :development
-
-# Use debugger
-# gem "debugger", group: [:development, :test]
-
-gem "bundler"
-
-gem "simple_form"
-gem "bootstrap-sass", github: "twbs/bootstrap-sass"
-gem "bootstrap-sass-extras"
-gem "devise", github: "plataformatec/devise"
-gem "omniauth"
-gem "omniauth-facebook"
-gem "validates_formatting_of"
-gem "tzinfo-data"
-gem "twilio-ruby"
-gem "thin"
-
-gem "dotenv-rails", :groups => [:development, :test] # for the .env file
-
-gem "haml-rails", "~> 0.8" # for haml generators
-gem "haml"
-
-
-gem "memcachier"                  # memcache service
-gem "kgio"                        # performance boost for dalli
+gem "bootstrap-sass"              # Use sass for boostrap
+gem "bootstrap-sass-extras"       # Use sass for boostrap
+gem "bundler"                     # Package manager
+gem "coffee-rails"                # Use CoffeeScript for .js.coffee assets and views
 gem "dalli"                       # memcached
-
-gem "rails_12factor", group: :production   # https://devcenter.heroku.com/articles/ruby-support#injected-plugins
-
-gem "multi_fetch_fragments" # for parallel fetching of cached items from memcache http://ninjasandrobots.com/rails-faster-partial-rendering-and-caching
-
+gem "devise"                      # Simple user system
+gem "haml"                        # Use haml for views and generators
+gem "haml-rails"                  # for haml generators
+gem "i18n"                        # translation
+gem "jbuilder"                    # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
+gem "jquery-rails"                # Use jquery as the JavaScript library
+gem "kgio"                        # performance boost for dalli
+gem "memcachier"                  # memcache service
+gem "multi_fetch_fragments"       # for parallel fetching of cached items from memcache http://ninjasandrobots.com/rails-faster-partial-rendering-and-caching
+gem "omniauth"                    # OmniAuth is a flexible authentication system utilizing Rack middleware https://github.com/intridea/omniauth
+gem "omniauth-facebook"           # Omniauth strategy for Facebook
+gem "pg"                          # Use postgresql as the database for Active Record
+gem "phone"                       # for parsing and validating phone numbers! And area code detection
+gem "pundit"                      # for a lightweight permissions system
+gem "sass-rails"                  # Use SCSS for stylesheets
+gem "simple_form"                 # simple form generator
+gem "turbolinks"                  # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
+gem "twilio-ruby"                 # Twilio
+gem "tzinfo-data"                 # TZInfo::Data contains data from the IANA Time Zone database packaged as Ruby modules for use with TZInfo.
+gem "uglifier"                    # Use Uglifier as compressor for JavaScript assets
+gem "validates_formatting_of"     # Simple validators (like for email) https://github.com/mattdbridges/validates_formatting_of
 
 group :development do
-  gem "awesome_print"
-  gem "pry" # better console
-  gem "pry-rails" #rails loader for pry
-  gem "colorize"
-  gem "hirb"
-  gem "byebug"
-  gem "pry-byebug"
-  gem "pry-stack_explorer"
-  gem "htmlentities"
-  gem "smarter_csv"
+  gem "awesome_print"             # Pretty print ruby objects https://github.com/michaeldv/awesome_print
+  gem "pry"                       # better console
+  gem "pry-rails"                 # rails loader for pry
+  gem "colorize"                  # Ruby string class extension for colors # https://github.com/fazibear/colorize
+  gem "hirb"                      # view framework for console https://github.com/cldwalker/hirb
+  gem "byebug"                    # debugger
+  gem "pry-byebug"                # use byebug with pry
+  gem "pry-stack_explorer"        # add stack navigation to pry https://github.com/pry/pry-stack_explorer
+  gem "thin"                      # Fast webserver for dev
+end
+
+group :staging, :production do
+  gem "rails_12factor"            # https://devcenter.heroku.com/articles/ruby-support#injected-plugins
+  gem "unicorn"                   # Use unicorn as the app server
 end
 
 group :test do
@@ -86,17 +56,17 @@ group :test do
 end
 
 group :development, :staging do
-  gem "rack-cors", require: "rack/cors"
+  gem "rack-cors", require: "rack/cors" # https://github.com/cyu/rack-cors
 end
 
 group :development, :test do
-  gem "rspec-rails" # , "~> 2.0"
-  gem "factory_girl_rails"
-  gem "faker"
-  gem "database_cleaner"
+  gem "rspec-rails"               # use rspec syntax for tests
+  gem "factory_girl_rails"        # factories for test data
+  gem "faker"                     # generate random data in different formats
+  gem "database_cleaner"          # clean database after tests
+  gem "dotenv-rails"              # for the .env file
 end
 
-gem "pundit" # for a lightweight permissions system
-gem "phone"  # for parsing and validating phone numbers! And area code detection
-gem "people" # for parsing names
-gem "i18n"   # translation
+group :doc do
+  gem "sdoc"                      # bundle exec rake doc:rails generates the API under doc/api.
+end
