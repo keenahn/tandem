@@ -4,7 +4,6 @@ require File.expand_path("../../config/environment", __FILE__)
 require "rspec/rails"
 require "pundit/rspec"
 
-
 # execute like this: $ COVERAGE=1 rpsec
 # This will generate a code coverage report in /coverage
 if ENV["COVERAGE"]

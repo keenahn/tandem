@@ -6,7 +6,7 @@
       %span.icon-bar
       %span.icon-bar
       %span.icon-bar
-    = link_to "My Application", defined?(root_path) ? root_path : "#", class: "navbar-brand"
+    = link_to "Tandem", defined?(root_path) ? root_path : "#", class: "navbar-brand"
   / Collect the nav links, forms, and other content for toggling
   #navbar-collapse-1.collapse.navbar-collapse
     %ul.nav.navbar-nav
@@ -18,10 +18,9 @@
               Account
               %b.caret
             %ul.dropdown-menu
-              %li= link_to "Edit Account", edit_user_path
+              %li= link_to t("tandem.general.edit_account"), edit_user_path
               %li.divider
-              %li= link_to "Sign Out", logout_path, method: :delete
+              %li= link_to t("tandem.general.logout"), logout_path, method: :delete
         - else
-          %li= link_to "Login", login_path
-          %li= link_to "Sign Up", signup_path
-  / /.navbar-collapse
+          %li= link_to t("tandem.general.login"), login_path
+          %li= link_to t("tandem.general.signup"), signup_path

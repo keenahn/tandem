@@ -368,7 +368,7 @@ Style/MultilineOperationIndentation:
     - indented
 
 Style/NumericLiterals:
-  MinDigits: 5
+  MinDigits: 10
 
 # Allow safe assignment in conditions.
 Style/ParenthesesAroundCondition:
@@ -504,7 +504,7 @@ Style/TrailingBlankLines:
 Style/TrailingComma:
   # If EnforcedStyleForMultiline is comma, the cop allows a comma after the
   # last item of a list, but only for lists where each item is on its own line.
-  EnforcedStyleForMultiline: no_comma
+  EnforcedStyleForMultiline: comma
   SupportedStyles:
     - comma
     - no_comma

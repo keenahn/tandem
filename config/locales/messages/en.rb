@@ -1,6 +1,7 @@
 # Text message translations
 class TandemStrings
 
+  # Get all the strings as a hash, ready for i18n
   def self.all
     {
       en: {
@@ -670,8 +671,8 @@ class TandemStrings
           } # close messages
         } # close tandem
       } # close en
-    } # close all
-  end
+    }
+  end # close self.all
 
 end
 

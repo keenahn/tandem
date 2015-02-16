@@ -27,7 +27,6 @@ describe GroupsController do
   end
 
   describe "Logged in" do
-
     login_user
 
     describe "has permission" do
@@ -41,7 +40,7 @@ describe GroupsController do
       it "should create group" do
         c = Group.count
         gr = FactoryGirl.build(:group)
-        post :create, group: { description: gr.description , name: gr.name, owner_id: subject.current_user.id }
+        post :create, group: { description: gr.description, name: gr.name, owner_id: subject.current_user.id }
         expect(Group.count).to equal(c + 1)
         expect(subject).to redirect_to(group_path(assigns(:group)))
       end
@@ -94,7 +93,6 @@ describe GroupsController do
       end
 
       it "should not destroy group" do
-        c = Group.count
         delete :destroy, id: g.id
         expect(Group.find_by_id g.id).to_not be_nil
         expect(subject).to redirect_to(root_path)

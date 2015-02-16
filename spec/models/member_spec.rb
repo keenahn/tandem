@@ -25,9 +25,5 @@ describe Member do
       @m.destroy
       expect(Pair.with_member_id(@m.id).count).to eq(0)
     end
-
   end
-
-
-
 end

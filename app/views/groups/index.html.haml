@@ -1,6 +1,6 @@
 = cache "user-#{current_user.updated_at.to_i}" do
   - if current_user.groups?
-    %h1= t("general.your_groups")
+    %h1= t("tandem.general.your_groups")
     %table.table.table-striped
       %thead
         %tr
@@ -12,3 +12,6 @@
       %tbody
         = render partial: "groups/row", collection: current_user.groups.ordered, as: :group, cache: true
   %p= link_to t('.new', default: t("helpers.links.new")), new_group_path, class: 'btn btn-primary'
+
+
+-# = t("messages.no_response_helper_post_first_time.0")
