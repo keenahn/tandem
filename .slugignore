@@ -10,6 +10,7 @@ ignore/
 *.sublime-project
 *.sublime-workspace
 .rubocop.yml
+.metrics
 .ruby-version
 .rspec
 prelang-init

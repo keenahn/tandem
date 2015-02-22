@@ -1,0 +1,9 @@
+# https://github.com/metricfu/metric_fu/#example-configuration
+# Use ruby 2.1.1 for now
+MetricFu.configuration.configure_metric(:reek) do |reek|
+  reek.enabled = false
+end
+
+MetricFu.configuration.configure_metric(:rails_best_practices) do |rails_best_practices|
+  rails_best_practices.enabled = true
+end
