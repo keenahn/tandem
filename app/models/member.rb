@@ -4,6 +4,8 @@ class Member < ActiveRecord::Base
   has_many :groups, through: :group_memberships
   has_many :group_memberships, dependent: :destroy
 
+  scope :in_group, ->(group_id) { g = Group.find_by_id group_id ; g.members if g }
+
   after_destroy :destroy_pairs
 
   # Returns AR object of pairs the member belongs to

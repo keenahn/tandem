@@ -3,7 +3,10 @@ Rails.application.routes.draw do
 
   get 'main/index'
 
-  resources :groups
+  resources :groups do
+    resources :pairs
+    resources :members
+  end
 
   resources :members
 

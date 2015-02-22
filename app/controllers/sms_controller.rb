@@ -1,68 +1,58 @@
 # Controller for receiving SMS's
 class SmsController < ApplicationController
 
+  @@debug = false
+
+  attr_accessor :message
+
   def receive
-    # Rails.logger.info params.inspect
-    u = User.find_by_phone_number params["From"]
-    @sent_from_admin = (!u || u.id == User::PIGGYBACKR_ADMIN_ID)
-    return false if @sent_from_admin
-    return false unless u.fundraisers.count > 0
-    fundraiser = u.fundraisers.first
-    s = Sms.new(
-      team_fundraiser_id: fundraiser.team.id,
-      from_id: u.id,
-      to_id: User::PIGGYBACKR_ADMIN_ID,
-      message: params["Body"],
-      category: Sms::INCOMING
-    )
-    s.save
+    return false unless (@@debug || TandemSms.valid_request?(params))
 
-    # TODO: fix up
+    tandem_number = params["To"][-10..10]
+    raise t("tandem.errors.no_from_number_provided") unless params["From"] # TODO: fix and internationalize
 
-    # body = params["Body"].strip.downcase
-    # if body == "stop" || body == "unsubscribe"
-    #   if !fundraiser.enable_sms
-    #     # # This calls send, too
-    #     # s = Sms.new({
-    #     #   team_fundraiser_id: fundraiser.team.id,
-    #     #   from_id: User::PIGGYBACKR_ADMIN_ID,
-    #     #   to_id: u.id,
-    #     #   message: render_to_string("sms/already_unsubscribed", formats: [:text], locals: {fundraiser: fundraiser}),
-    #     #   category: Sms::ALREADY_UNSUBSCRIBED
-    #     # })
+    member_number = params["From"][-10..10]
 
-    #     # s.save!
-    #   else
-    #     # This calls send, too
-    #     s = Sms.new({
-    #       team_fundraiser_id: fundraiser.team.id,
-    #       from_id: User::PIGGYBACKR_ADMIN_ID,
-    #       to_id: u.id,
-    #       message: render_to_string("sms/unsubscribed", formats: [:text], locals: {fundraiser: fundraiser}),
-    #       category: Sms::UNSUBSCRIBE
-    #     })
+    # Find the member based on their phone number
+    # TODO: what if the same phone number is used for members who belong in multiple groups?
+    member = Member.find_by_phone_number(member_number)
+    return TandemSms.twiml(t("tandem.messages.phone_number_not_in_system", member_number: member_number)) unless member
+    return TandemSms.twiml(t("tandem.messages.phone_number_unsubscribed", member_number: member_number)) if member.unsubscribed?
 
-    #     s.save!
-    #   end
-    #   u.fundraisers.update_all(enable_sms: false)
+    # Find the pair, since they are uniquely identified by member_number, tandem_number
+    pair   = Pair.find_by_member_and_tandem_number(member_number, tandem_number)
+    return TandemSms.twiml(t("tandem.messages.pair_not_found", member_number: member_number, tandem_number: tandem_number)) unless pair
 
-    #   return render nothing: true, status: 200, content_type: 'text/html'
-    # else
+    # Get the date in the member's timezone
+    local_date = member.local_date
 
-    #   UtilityMailer.incoming_sms(u.id, params).deliver
+    # Get the activity for the member from the pair
+    activity   = pair.get_activity(member)
 
-    #   # Do nothing, for now
+    # checkin exists, or it's a one way relationship, and the message was received
+    # from the helper
+    checkin = member.checkins.find_by_activity_and_local_date(activity, local_date)
 
-    #   # s = Sms.new({
-    #   #   team_fundraiser_id: fundraiser.team.id,
-    #   #   from_id: User::PIGGYBACKR_ADMIN_ID,
-    #   #   to_id: u.id,
-    #   #   message: render_to_string("sms/unknown_command", formats: [:text], locals: {fundraiser: fundraiser}),
-    #   #   category: Sms::UNKNOWN_COMMAND
-    #   # })
+    # Parse the actual comment received
+    body = params["Body"].strip
+    parsed_body = TandemParser.parse(body)
 
-    #   # s.save!
-    # end
+    # Save it to the database
+    message = Sms.create(from_number: member_number, to_number: tandem_number, body: body)
+
+    # get the other member
+    partner = pair.get_partner(member)
+
+    if checkin
+      return handle_yes if parsed_body.matches_yes?
+      return handle_reschedule if parsed_body.matches_reschedule?
+      return handle_am_pm if parsed_body.matches_am_pm?
+    end
+    return handle_unsubscribe if parsed_body.matches_unsubscribe?
+    handle_pass_through
+  end
+
+
     render nothing: true, status: 200, content_type: "text/html"
   end
 

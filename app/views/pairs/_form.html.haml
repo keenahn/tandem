@@ -8,16 +8,16 @@
 
   .field
     = f.label :group_id
-    = collection_select(:pair, :group_id, Group.all, :id, :name)
+    = collection_select :pair, :group_id, Group.all, :id, :name, {}, { class: "select2" }
 
     -#= f.collection_select(:group, Group.all, :id, :name)
   .field
     = f.label :member_1_id
-    = collection_select(:pair, :member_1_id, Member.all, :id, :name)
+    = collection_select :pair, :member_1_id, Member.all, :id, :name, {}, { class: "select2" }
     -#= f.collection_select(:member_1, Member.all, :id, :name)
   .field
     = f.label :member_2_id
-    = collection_select(:pair, :member_2_id, Member.all, :id, :name)
+    = collection_select :pair, :member_2_id, Member.all, :id, :name, {}, { class: "select2" }
     -#= f.collection_select(:member_2, Member.all, :id, :name)
 
 

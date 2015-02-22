@@ -1,4 +1,6 @@
 = form_for @member, html: { class: 'form-horizontal form-model' } do |f|
+  = hidden_field_tag :group_id, @group ? @group.id : nil
+
   .form-group
     = f.label :name, class: 'control-label col-md-2'
     .col-md-10

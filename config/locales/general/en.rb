@@ -7,6 +7,10 @@
         logout: "Log Out",
         login: "Login",
         signup: "Sign Up",
+      },
+      errors: {
+        no_from_number_provided: "No 'From' number provided",
+
       }
     }
   }

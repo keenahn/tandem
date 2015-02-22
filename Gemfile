@@ -26,6 +26,7 @@ gem "pg"                          # Use postgresql as the database for Active Re
 gem "phone"                       # for parsing and validating phone numbers! And area code detection
 gem "pundit"                      # for a lightweight permissions system
 gem "sass-rails"                  # Use SCSS for stylesheets
+gem "select2-rails"               # Better dropdowns for forms
 gem "simple_form"                 # simple form generator
 gem "turbolinks"                  # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
 gem "twilio-ruby"                 # Twilio
