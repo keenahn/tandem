@@ -8,6 +8,8 @@
           %th= Group.human_attribute_name(:name)
           %th= Group.human_attribute_name(:description)
           %th= Group.human_attribute_name(:created_at)
+          %th= Group.human_attribute_name(:members)
+          %th= Group.human_attribute_name(:pairs)
           %th= t '.actions', default: t("helpers.actions")
       %tbody
         = render partial: "groups/row", collection: current_user.groups.ordered, as: :group, cache: true

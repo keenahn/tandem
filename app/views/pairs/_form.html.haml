@@ -8,7 +8,8 @@
 
   .field
     = f.label :group_id
-    = collection_select :pair, :group_id, Group.all, :id, :name, {}, { class: "select2" }
+    = @pair.group
+    -# = collection_select :pair, :group_id, Group.all, :id, :name, {}, { class: "select2" }
 
     -#= f.collection_select(:group, Group.all, :id, :name)
   .field
