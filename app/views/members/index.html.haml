@@ -1,14 +1,14 @@
-- model_class = Member
 .page-header
   %h1= t '.title', default: Member
 %table.table.table-striped
   %thead
     %tr
       %th ID
-      %th= model_class.human_attribute_name(:name)
-      %th= model_class.human_attribute_name(:phone_number)
-      %th= model_class.human_attribute_name(:active)
-      %th= model_class.human_attribute_name(:created_at)
+      %th= Member.human_attribute_name(:name)
+      %th= Member.human_attribute_name(:phone_number)
+      %th= Member.human_attribute_name(:time_zone)
+      %th= Member.human_attribute_name(:active)
+      %th= Member.human_attribute_name(:created_at)
       %th= t '.actions', default: t("helpers.actions")
   %tbody
     - @members.each do |member|
@@ -16,6 +16,7 @@
         %td= member.id
         %td= member.name
         %td= member.phone_number
+        %td= member.time_zone
         %td= member.active
         %td= l member.created_at, format: :long
         %td

@@ -5,9 +5,14 @@ describe Group do
   it { should have_many(:members).through(:group_memberships).dependent(:destroy) }
   it { should have_many(:group_memberships).dependent(:destroy) }
   it { should have_many(:pairs).dependent(:destroy) }
+  it { should respond_to(:time_zone) }
+  it "should set a default time zone" do
+    g = FactoryGirl.create(:group)
+    expect(g.time_zone).to eq(g.owner.time_zone)
+  end
 
   it ".to_s" do
     g = FactoryGirl.build(:group)
-    expect(g.name).to eq(g.name)
+    expect(g.to_s).to eq(g.name)
   end
 end

@@ -3,10 +3,19 @@ require "spec_helper"
 describe Member do
   it { should have_many(:groups).through(:group_memberships) }
   it { should have_many(:group_memberships).dependent(:destroy) }
+  it { should respond_to(:time_zone) }
 
   it ".to_s" do
     m = Member.new(name: Faker::Name.name)
     expect(m.name).to eq(m.name)
+  end
+
+  describe "groups" do
+    it "should set a default time zone" do
+      g = FactoryGirl.create(:group_with_members)
+      m = g.members.first
+      expect(m.time_zone).to eq(g.time_zone)
+    end
   end
 
   describe "pairs" do

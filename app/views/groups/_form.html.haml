@@ -8,6 +8,11 @@
     .col-md-10
       = f.text_area :description, class: 'text-field form-control'
   .form-group
+    = f.label :time_zone, class: 'control-label col-md-2'
+    .col-md-10
+      = f.time_zone_select( :time_zone, ActiveSupport::TimeZone.us_zones, default: "Pacific Time (US & Canada)")
+
+  .form-group
     .col-md-offset-2.col-md-10
       = f.submit nil, class: 'btn btn-primary'
       = link_to t('.cancel', default: t("helpers.links.cancel")), |

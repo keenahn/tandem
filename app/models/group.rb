@@ -5,11 +5,19 @@ class Group < ActiveRecord::Base
   has_many :members, through: :group_memberships, dependent: :destroy
   has_many :group_memberships, dependent: :destroy
   has_many :pairs, dependent: :destroy
+  before_create :set_defaults
+
 
   scope :ordered, -> { order(:name) }
 
   def to_s
     name
+  end
+
+  private
+
+  def set_defaults
+    self.time_zone ||= owner.time_zone
   end
 
 end

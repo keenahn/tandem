@@ -8,7 +8,7 @@ FactoryGirl.define do
       # members_count is declared as a transient attribute and available in
       # attributes on the factory, as well as the callback via the evaluator
       transient do
-        members_count 10
+        members_count 4
       end
 
       # the after(:create) yields two values; the user instance itself and the

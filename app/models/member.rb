@@ -17,11 +17,18 @@ class Member < ActiveRecord::Base
     name
   end
 
+  def update_time_zone_from_group group
+    self.time_zone = group.time_zone if time_zone.nil?
+    save
+  end
+
   private
 
   # TODO: unit tests
   def destroy_pairs
     pairs.destroy_all
   end
+
+
 
 end

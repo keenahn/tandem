@@ -3,6 +3,7 @@
   -# %td= group.id
   %td= group.name
   %td= group.description
+  %td= group.time_zone
   %td= l group.created_at, format: :long
   %td
     = link_to group_members_path(group), class: "btn btn-xs", title: "#{t(".show", default: t("helpers.links.show"))}" do

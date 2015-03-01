@@ -11,5 +11,10 @@ describe User do
     it { should respond_to(:email) }
     it { should respond_to(:password) }
     it { should be_valid }
+    it { should respond_to(:time_zone) }
+    it "should set a default time zone" do
+      u = FactoryGirl.create(:user, time_zone: nil)
+      expect(u.time_zone).to eq(User::DEFAULT_TIMEZONE)
+    end
   end
 end
