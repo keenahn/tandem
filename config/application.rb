@@ -28,8 +28,11 @@ module Tandem
     config.autoload_paths += Dir["#{config.root}/lib", "#{config.root}/lib/**/"]
 
 
-    # Set the default time zone
-    config.time_zone = "Pacific Time (US & Canada)" # Default time zone
+    # Set the default time zones. DO NOT CHANGE THIS
+    # http://jessehouse.com/blog/2013/11/15/working-with-timezones-and-ruby-on-rails/
+    # We will always keep the system defaults as UTC and then change it per user
+    # config.time_zone = "UTC" # Default time zone for displaying
+    # config.active_record.default_timezone = :utc    # For saving to the database
 
 
     # config.generators do |g|
