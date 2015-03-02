@@ -15,6 +15,14 @@ class TandemStrings
               short_noun: "'tate",
               simple_present: "meditate",
             },
+            work_out: {
+              infinitive: "to work out",
+              noun: "working out",
+              past: "worked out",
+              present_particple: "working out",
+              short_noun: "'tate",
+              simple_present: "work out",
+            },
           },
 
           pronouns: {

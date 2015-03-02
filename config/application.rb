@@ -24,6 +24,8 @@ module Tandem
     # load subdirectories too
     config.i18n.load_path += Dir[Rails.root.join('config', 'locales', '**', '*.{rb,yml}')]
 
+    config.autoload_paths += Dir["#{config.root}/lib", "#{config.root}/lib/**/"]
+
     # config.generators do |g|
     #   g.orm             :active_record
     #   g.template_engine :haml

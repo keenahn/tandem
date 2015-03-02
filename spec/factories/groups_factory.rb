@@ -3,6 +3,7 @@ FactoryGirl.define do
     owner
     name { Faker::Company.name }
     description { Faker::Company.catch_phrase }
+    activity { "work_out" }
 
     factory :group_with_members do
       # members_count is declared as a transient attribute and available in

@@ -5,8 +5,15 @@ class Group < ActiveRecord::Base
   has_many :members, through: :group_memberships, dependent: :destroy
   has_many :group_memberships, dependent: :destroy
   has_many :pairs, dependent: :destroy
-  before_create :set_defaults
 
+
+  before_validation(on: :create) do
+    set_defaults
+  end
+
+  # before_create :set_defaults
+
+  validates :activity, inclusion: { in: Tandem::Activity::ACTIVITIES }
 
   scope :ordered, -> { order(:name) }
 
@@ -18,6 +25,7 @@ class Group < ActiveRecord::Base
 
   def set_defaults
     self.time_zone ||= owner.time_zone
+    self.activity  ||= Tandem::Activity::DEFAULT_ACTIVITY
   end
 
 end

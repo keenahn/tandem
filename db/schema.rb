@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150301224115) do
+ActiveRecord::Schema.define(version: 20150302072314) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -34,8 +34,10 @@ ActiveRecord::Schema.define(version: 20150301224115) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "time_zone",   default: "Pacific Time (US & Canada)"
+    t.string   "activity"
   end
 
+  add_index "groups", ["activity"], name: "index_groups_on_activity", using: :btree
   add_index "groups", ["owner_id"], name: "index_groups_on_owner_id", using: :btree
 
   create_table "members", force: :cascade do |t|
@@ -61,8 +63,10 @@ ActiveRecord::Schema.define(version: 20150301224115) do
     t.integer  "member_2_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "activity"
   end
 
+  add_index "pairs", ["activity"], name: "index_pairs_on_activity", using: :btree
   add_index "pairs", ["group_id"], name: "index_pairs_on_group_id", using: :btree
   add_index "pairs", ["member_1_id"], name: "index_pairs_on_member_1_id", using: :btree
   add_index "pairs", ["member_2_id"], name: "index_pairs_on_member_2_id", using: :btree

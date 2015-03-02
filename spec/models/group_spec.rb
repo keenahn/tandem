@@ -6,9 +6,16 @@ describe Group do
   it { should have_many(:group_memberships).dependent(:destroy) }
   it { should have_many(:pairs).dependent(:destroy) }
   it { should respond_to(:time_zone) }
+  it { should respond_to(:activity) }
+
   it "should set a default time zone" do
-    g = FactoryGirl.create(:group)
+    g = FactoryGirl.create(:group, time_zone: nil)
     expect(g.time_zone).to eq(g.owner.time_zone)
+  end
+
+  it "should set a default activity" do
+    g = FactoryGirl.create(:group, activity: nil)
+    expect(g.activity).to eq(Tandem::Activity::DEFAULT_ACTIVITY)
   end
 
   it ".to_s" do
