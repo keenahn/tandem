@@ -6,6 +6,7 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
   before_filter :configure_permitted_parameters, if: :devise_controller?
   before_action :set_locale
+  before_action :set_time_zone, if: :user_signed_in?
 
   protected
 
@@ -38,5 +39,10 @@ class ApplicationController < ActionController::Base
   def set_locale
     I18n.locale = params[:locale] || I18n.default_locale
   end
+
+  def set_time_zone
+    Time.zone = current_user.time_zone if current_user.time_zone
+  end
+
 
 end

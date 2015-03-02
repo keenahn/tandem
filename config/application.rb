@@ -24,7 +24,13 @@ module Tandem
     # load subdirectories too
     config.i18n.load_path += Dir[Rails.root.join('config', 'locales', '**', '*.{rb,yml}')]
 
+    # Load all stuff in lib
     config.autoload_paths += Dir["#{config.root}/lib", "#{config.root}/lib/**/"]
+
+
+    # Set the default time zone
+    config.time_zone = "Pacific Time (US & Canada)" # Default time zone
+
 
     # config.generators do |g|
     #   g.orm             :active_record
