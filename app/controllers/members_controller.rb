@@ -39,16 +39,11 @@ class MembersController < ApplicationController
   def create
     params.delete(:group_id) if params[:group_id]
 
-    # Build the member object
-    @member = Member.new(member_params)
-    member_saved = @member.save
-
-    # Add the member to the group if
-    create_membership if member_saved && @group
-
+    @member = create_member_and_membership(member_params)
     respond_to do |format|
       format.html {
         return render :new unless member_saved
+        # TODO: internationalize
         redirect_to(@member, notice: "Member was successfully created.")
       }
 
@@ -59,11 +54,49 @@ class MembersController < ApplicationController
     end
   end
 
+  # Only responds to json
+  def bulk_import
+    params.delete(:group_id) if params[:group_id]
+    members = params[:members].try(:values)
+    return render(json: {error: "No members sumbitted"}, status: :unprocessable_entity) unless members
+
+    rendered_rows = []
+    error_rows = []
+    members.each do |member_params|
+      member_params[:time_zone] = @group.time_zone
+      @member = create_member_and_membership(member_params)
+      if @member
+        rendered_rows << render_to_string(partial: "members/row", locals: { member: @member })
+      else
+        error_rows << member_params
+      end
+    end
+
+    if rendered_rows.count > 0
+      status = :ok
+      # TODO: internationalize
+      alert_type = "success"
+      bold_message = "Awesome!"
+      plural_members = ActionController::Base.helpers.pluralize(rendered_rows.count, "member", "members")
+      message = "You imported #{plural_members}"
+      locals = { alert_type: alert_type, bold_message: bold_message, message: message }
+      alert = render_to_string(partial: "bootstrap/dismissable_alert", locals: locals)
+    else
+      status = :unprocessable_entity
+      alert_type = "error"
+      alert = nil
+    end
+
+
+    return render(json: { rendered_rows: rendered_rows, error_rows: error_rows, alert: alert}, status: status)
+  end
+
   # PATCH/PUT /members/1
   # PATCH/PUT /members/1.json
   def update
     respond_to do |format|
       if @member.update(member_params)
+        # TODO: internationalize
         format.html { redirect_to @member, notice: "Member was successfully updated." }
         format.json { render :show, status: :ok, location: @member }
       else
@@ -78,6 +111,7 @@ class MembersController < ApplicationController
   def destroy
     @member.destroy
     respond_to do |format|
+      # TODO: internationalize
       format.html { redirect_to members_url, notice: "Member was successfully destroyed." }
       format.json { head :no_content }
     end
@@ -104,5 +138,15 @@ class MembersController < ApplicationController
     GroupMembership.create(group: @group, member: @member) if @group && @member
   end
 
+  def create_member_and_membership member_params
+    # Build the member object
+    member = Member.new(member_params)
+    member_saved = member.save
+
+    # Add the member to the group if saved
+    return false unless member_saved
+    create_membership if member_saved && @group
+    member
+  end
 
 end

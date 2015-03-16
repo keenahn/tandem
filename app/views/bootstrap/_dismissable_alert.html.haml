@@ -1,0 +1,8 @@
+- # expects type, bold_message, message to be passed in as locals
+- bold_message ||= false
+.alert.alert-dismissible{role: "alert", class: "alert-#{alert_type}"}
+  %button.close{"aria-label" => "Close", "data-dismiss" => "alert", type: "button"}
+    %span{"aria-hidden" => "true"} ×
+  - if bold_message
+    %strong= bold_message
+  = message

@@ -15,6 +15,9 @@
 // require turbolinks
 //= require bootstrap
 //= require select2
+//= require nprogress
+
+// This has to come before require_tree
 //= require tandem
 
 //= require_tree .

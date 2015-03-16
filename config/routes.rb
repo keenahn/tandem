@@ -5,7 +5,9 @@ Rails.application.routes.draw do
 
   resources :groups do
     resources :pairs
-    resources :members
+    resources :members do
+      post "/bulk_import" => "members#bulk_import", on: :collection
+    end
   end
 
   resources :members

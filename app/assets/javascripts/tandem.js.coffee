@@ -19,6 +19,39 @@ class window.TANDEM
     parts = window.location.href.replace /[?&]+([^=&]+)=([^&]*)/g, (m, key, value) => @_get_vars[key] = value
     @_get_vars
 
+  @show_ajax_loader = () ->
+    NProgress.start()
+
+  @hide_ajax_loader = () -> NProgress.done()
+
+  @bind_ajax_loading = (form_selector) =>
+    $document = $(document)
+    $document.on "ajax:before", form_selector, {}, @show_ajax_loader
+    $document.on "ajax:complete", form_selector, {}, @hide_ajax_loader
+
+  @default_error = (data) =>
+    a = $.parseJSON(data.responseText)
+    if data.errors
+      @alert data.errors
+    else if a
+      @log_if_admin a.errors
+      @alert a.errors if a.errors
+    if data.next_url
+      @redir data.next_url
+    else if a
+      @redir a.next_url if a.next_url
+    false
+
+  @bind_ajax_success_error = (form_selector, success, error = false) ->
+    $document = $(document)
+    $document.on "ajax:remotipartSubmit", form_selector, {}, (e, xhr, settings) -> settings.dataType = "json"
+    $document.on "ajax:success", form_selector, {}, success
+    unless error
+      error = (evt, data, status, xhr) -> @default_error(data)
+    $document.on "ajax:error", form_selector, {}, error
+
+  @language = "en" # Force English, for now
+
   ################################################################################
   # Module Pattern
   # http://stackoverflow.com/questions/6107705/module-pattern-in-coffeescript-with-hidden-variables#answer-6595285

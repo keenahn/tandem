@@ -10,7 +10,9 @@
       },
       errors: {
         no_from_number_provided: "No 'From' number provided",
-
+      },
+      helpers: {
+        bulk_import: "Bulk Import"
       }
     }
   }

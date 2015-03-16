@@ -8,7 +8,7 @@
     = javascript_include_tag 'application', 'data-turbolinks-track' => true
     = csrf_meta_tags
     %meta{content: "width=device-width, initial-scale=1", name: "viewport"}/
-  %body
+  %body{ class: [controller.controller_name, controller.action_name] }
     = render partial: "elements/navbar"
     %main
       = bootstrap_flash

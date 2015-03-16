@@ -1,0 +1,15 @@
+#bulk-import-modal.modal.fade{"aria-hidden" => "true", "aria-labelledby" => "myModalLabel", role: "dialog", tabindex: "-1"}
+  .modal-dialog
+    .modal-content
+      .modal-header
+        %button.close{"aria-label" => "Close", "data-dismiss" => "modal", type: "button"}
+          %span{"aria-hidden" => "true"} ×
+        %h4.modal-title Bulk Import
+      .modal-body
+        %label.control-label{for: "contacts"} One entry per line. Use a comma to separate the user's full name and phone number.
+        %textarea.contacts.form-control{name: "contacts", rows: "10", placeholder: "first last, phone number\nfirst last, phone number\nfirst last, phone number\n"}
+
+      .modal-footer
+        %button.btn.btn-default{"data-dismiss" => "modal", type: "button"} Cancel
+        %button.btn.btn-primary.import{type: "button"} Import
+

@@ -1,0 +1,14 @@
+%tr
+  %td= member.id
+  %td= member.name
+  %td= member.phone_number
+  %td= member.time_zone
+  %td= member.active
+  %td= l member.created_at, format: :long
+  %td
+    = link_to member, class: "btn btn-xs", title: "#{t(".show", default: t("helpers.links.show"))}" do
+      = glyph "info-sign"
+    = link_to  edit_member_path(member), class: "btn btn-xs", title: "#{t(".edit", default: t("helpers.links.edit"))}" do
+      = glyph "pencil"
+    = link_to member, method: :delete, data: { confirm: t(".confirm", default: t("helpers.links.confirm", default: "Are you sure?")) }, class: "btn btn-xs", title: "#{t(".destroy", default: t("helpers.links.destroy"))}" do
+      = glyph "remove"

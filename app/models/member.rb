@@ -8,6 +8,10 @@ class Member < ActiveRecord::Base
 
   after_destroy :destroy_pairs
 
+  before_validation(on: :create) do
+    set_defaults
+  end
+
   # Returns AR object of pairs the member belongs to
   def pairs
     Pair.with_member_id(id)
@@ -23,6 +27,10 @@ class Member < ActiveRecord::Base
   end
 
   private
+
+  def set_defaults
+    self.active = true
+  end
 
   # TODO: unit tests
   def destroy_pairs
