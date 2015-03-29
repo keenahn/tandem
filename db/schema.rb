@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150302072314) do
+ActiveRecord::Schema.define(version: 20150329073258) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -49,14 +49,6 @@ ActiveRecord::Schema.define(version: 20150302072314) do
     t.string   "time_zone",                default: "Pacific Time (US & Canada)"
   end
 
-  create_table "members_pairs", force: :cascade do |t|
-    t.integer "member_id"
-    t.integer "pair_id"
-  end
-
-  add_index "members_pairs", ["member_id"], name: "index_members_pairs_on_member_id", using: :btree
-  add_index "members_pairs", ["pair_id"], name: "index_members_pairs_on_pair_id", using: :btree
-
   create_table "pairs", force: :cascade do |t|
     t.integer  "group_id"
     t.integer  "member_1_id"
@@ -64,8 +56,10 @@ ActiveRecord::Schema.define(version: 20150302072314) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "activity"
+    t.boolean  "active",      default: true, null: false
   end
 
+  add_index "pairs", ["active"], name: "index_pairs_on_active", using: :btree
   add_index "pairs", ["activity"], name: "index_pairs_on_activity", using: :btree
   add_index "pairs", ["group_id"], name: "index_pairs_on_group_id", using: :btree
   add_index "pairs", ["member_1_id"], name: "index_pairs_on_member_1_id", using: :btree
