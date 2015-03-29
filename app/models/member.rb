@@ -1,10 +1,38 @@
 # A single member of a group. NOT a User (which is who admins the members)
 class Member < ActiveRecord::Base
 
+  ##############################################################################
+  # INCLUDES
+  ##############################################################################
+
+  include Concerns::ActiveRecordExtensions
+
+  ##############################################################################
+  # CONSTANTS
+  ##############################################################################
+
+  ##############################################################################
+  # MACROS
+  ##############################################################################
+
+  ##############################################################################
+  # ATTRIBUTES
+  ##############################################################################
+
+  ##############################################################################
+  # RELATIONSHIPS
+  ##############################################################################
+
   has_many :groups, through: :group_memberships
   has_many :group_memberships, dependent: :destroy
 
-  scope :in_group, ->(group_id) { g = Group.find_by_id group_id ; g.members if g }
+  ##############################################################################
+  # VALIDATIONS
+  ##############################################################################
+
+  ##############################################################################
+  # CALLBACKS
+  ##############################################################################
 
   after_destroy :destroy_pairs
 
@@ -12,7 +40,22 @@ class Member < ActiveRecord::Base
     set_defaults
   end
 
+  ##############################################################################
+  # SCOPES
+  ##############################################################################
+
+  scope :in_group, ->(group_id) { g = Group.find_by_id group_id ; g.members if g }
+
+  ##############################################################################
+  # CLASS METHODS
+  ##############################################################################
+
+  ##############################################################################
+  # INSTANCE METHODS
+  ##############################################################################
+
   # Returns AR object of pairs the member belongs to
+  # Use this instead of a has_many, even though it is the same functionally
   def pairs
     Pair.with_member_id(id)
   end
@@ -26,6 +69,20 @@ class Member < ActiveRecord::Base
     save
   end
 
+  # TODO: unit tests
+  def can_message? other_member
+    in_pair_with? other_member
+  end
+
+  # TODO: unit tests
+  def in_pair_with? other_member
+    Pair.active.with_member_ids(id, other_member.id).exists?
+  end
+
+  ##############################################################################
+  # PRIVATE METHODS
+  ##############################################################################
+
   private
 
   def set_defaults
@@ -36,7 +93,5 @@ class Member < ActiveRecord::Base
   def destroy_pairs
     pairs.destroy_all
   end
-
-
 
 end

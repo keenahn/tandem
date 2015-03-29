@@ -1,36 +1,80 @@
 # User class from devise
 class User < ActiveRecord::Base
 
+  ##############################################################################
+  # INCLUDES
+  ##############################################################################
+
+  include Concerns::ActiveRecordExtensions
+
+  ##############################################################################
+  # CONSTANTS
+  ##############################################################################
+
   DEFAULT_TIMEZONE = "Pacific Time (US & Canada)"
 
-  attr_accessor :login
+  ##############################################################################
+  # MACROS
+  ##############################################################################
 
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
   devise :database_authenticatable, :registerable, :recoverable, :rememberable, :trackable, :validatable
   devise authentication_keys: [:login]
 
+  ##############################################################################
+  # ATTRIBUTES
+  ##############################################################################
+
+  attr_accessor :login
+
+  ##############################################################################
+  # RELATIONSHIPS
+  ##############################################################################
+
   has_many :groups, foreign_key: :owner_id, dependent: :destroy
+
+  ##############################################################################
+  # VALIDATIONS
+  ##############################################################################
 
   validates :email, presence: true
   validates :password, presence: true
 
+  ##############################################################################
+  # CALLBACKS
+  ##############################################################################
+
   before_create :set_defaults
 
-  #->Prelang (user_login:devise/username_login_support)
+  ##############################################################################
+  # SCOPES
+  ##############################################################################
+
+  ##############################################################################
+  # CLASS METHODS
+  ##############################################################################
+
   def self.find_first_by_auth_conditions(warden_conditions)
     conditions = warden_conditions.dup
     login = conditions.delete(:login)
-    if login
-      where(conditions).where(["lower(username) = :value OR lower(email) = :value", { value: login.downcase }]).first
-    else
-      where(conditions).first
-    end
+    return where(conditions).first unless login
+    where(conditions).where([
+      "lower(username) = :value OR
+       lower(email) = :value", { value: login.downcase }]).first
   end
+
+  ##############################################################################
+  # INSTANCE METHODS
+  ##############################################################################
 
   def groups?
     groups.count > 0
   end
+
+  ##############################################################################
+  # PRIVATE METHODS
+  ##############################################################################
 
   private
 

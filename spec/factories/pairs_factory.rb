@@ -4,5 +4,6 @@ FactoryGirl.define do
     association :member_1, factory: :member
     association :member_2, factory: :member
     activity { "meditation" }
+    active { true }
   end
 end

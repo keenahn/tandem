@@ -1,13 +1,12 @@
 # A class representing an SMS message
 class Sms < ActiveRecord::Base
 
-  validate :present_owner
   validates :to_id,   presence: true
   validates :from_id, presence: true
   validates :message, presence: true
   validate :can_send?
 
-  attr_protected :from_number, :to_number
+  # attr_protected :from_number, :to_number
 
   belongs_to :to, class_name: "Member"
   belongs_to :from, class_name: "Member"
