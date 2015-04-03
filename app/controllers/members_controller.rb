@@ -134,10 +134,6 @@ class MembersController < ApplicationController
     params.require(:member).permit(:name, :phone_number, :active, :time_zone)
   end
 
-  def create_membership
-    GroupMembership.create(group: @group, member: @member) if @group && @member
-  end
-
   def create_member_and_membership member_params
     # Build the member object
     member = Member.new(member_params)
@@ -145,7 +141,8 @@ class MembersController < ApplicationController
 
     # Add the member to the group if saved
     return false unless member_saved
-    create_membership if member_saved && @group
+    return member unless (member_saved && @group)
+    GroupMembership.create(group: @group, member: member)
     member
   end
 
