@@ -22,4 +22,16 @@ describe Group do
     g = FactoryGirl.build(:group)
     expect(g.to_s).to eq(g.name)
   end
+
+  it "add_member" do
+    g = FactoryGirl.create(:group)
+    m1 = FactoryGirl.create(:member)
+    m2 = FactoryGirl.create(:member)
+    m3 = FactoryGirl.create(:member)
+    g.add_member m1
+    g.add_member m3
+    expect(g.members.pluck(:id)).to match_array([m1.id, m3.id])
+  end
+
+
 end

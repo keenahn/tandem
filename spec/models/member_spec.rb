@@ -16,6 +16,28 @@ describe Member do
       m = g.members.first
       expect(m.time_zone).to eq(g.time_zone)
     end
+
+    it "includes users in_group" do
+      g  = FactoryGirl.create(:group)
+      m1 = FactoryGirl.create(:member)
+      m2 = FactoryGirl.create(:member)
+      m3 = FactoryGirl.create(:member)
+      g.add_member m2
+      g.add_member m3
+      expect(Member.in_group(g.id).pluck(:id)).to match_array([m2.id, m3.id])
+    end
+
+    it "set timezone from group" do
+      g  = FactoryGirl.create(:group)
+      m1 = FactoryGirl.create(:member)
+
+      m1.time_zone = nil
+      m1.save
+
+      expect(m1.time_zone).not_to eq(g.time_zone)
+      m1.update_time_zone_from_group g
+      expect(m1.time_zone).to eq(g.time_zone)
+    end
   end
 
   describe "pairs" do
@@ -63,5 +85,13 @@ describe Member do
       @m.destroy
       expect(Pair.with_member_id(@m.id).count).to eq(0)
     end
+
+    it "set_defaults before validation on create" do
+      @m = FactoryGirl.build(:member)
+      @m.should_receive(:set_defaults)
+      @m.valid?
+    end
+
   end
+
 end
