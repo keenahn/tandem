@@ -1,6 +1,8 @@
 # A class representing an SMS message
 class Sms < ActiveRecord::Base
 
+  include ActiveSupport::Configurable
+
   validates :to_id,   presence: true
   validates :from_id, presence: true
   validates :message, presence: true
@@ -8,63 +10,39 @@ class Sms < ActiveRecord::Base
 
   # attr_protected :from_number, :to_number
 
-  belongs_to :to, class_name: "Member"
-  belongs_to :from, class_name: "Member"
+  belongs_to :to, polymorphic: true
+  belongs_to :from, polymorphic: true
 
   after_validation :clean_params
   after_create :send_sms
 
   MAX_LENGTH = 160
 
-  def present_owner
-    # TODO
-  end
-
-  # TODO: unit tests for all this shiz
-  def can_send?
-    # TODO
-    # unless from_id == User::PIGGYBACKR_ADMIN_ID
-    #   unless from_owner == from_u
-    #     errors[:base] << "Only the team leader can send text messages"
-    #     return false
-    #   end
-    # end
-
-    true
+  def dry_run?
+    Sms.config.dry_run
   end
 
   private
 
+  def can_send?
+    from.can_message? to
+  end
+
   def send_sms
-    # TODO: move this elsewhere?
-    return Rails.logger.info(inspect) if Rails.env.development?
+    return Rails.logger.info(inspect) if dry_run?
     TwilioClient.sms to_number, message
   end
 
   def clean_params
-    # TODO
-    # if !from_number
-    #   a = User.find_by_id from_id
-    #   return false unless a
-    #   # return false unless a && a.phone_number.present?
-    #   # TODO: add this requirement back in later but we don't currently use the return number for anything.
-    #   # Eventually we want to be able to relay messages back to the team leader or org leader
-    #   self.from_number = a.phone_number
-    # end
+    self.from_number = from.try(:phone_number) unless from_number
+    self.to_number = to.try(:phone_number) unless to_number
+    self.message = message.squish
 
-    # if !to_number
-    #   a = User.find_by_id to_id
-    #   return false unless a && a.phone_number.present?
-    #   self.to_number = a.phone_number
-    # end
-
-    # self.message = message.squish
-
-    # unless from_number && to_number
-    #   errors[:base] << "From number or to number is missing"
-    #   return false
-    # end
-    # return true
+    unless from_number && to_number
+      errors[:base] << "From number or to number is missing"
+      return false
+    end
+    true
   end
 
 end

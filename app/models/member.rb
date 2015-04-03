@@ -6,6 +6,7 @@ class Member < ActiveRecord::Base
   ##############################################################################
 
   include Concerns::ActiveRecordExtensions
+  include Concerns::SmsableMixin
 
   ##############################################################################
   # CONSTANTS
@@ -29,6 +30,9 @@ class Member < ActiveRecord::Base
   ##############################################################################
   # VALIDATIONS
   ##############################################################################
+
+  # TODO: validate first and last name
+  # TODO: validate phone number presence and format
 
   ##############################################################################
   # CALLBACKS
@@ -69,12 +73,10 @@ class Member < ActiveRecord::Base
     save
   end
 
-  # TODO: unit tests
   def can_message? other_member
     in_pair_with? other_member
   end
 
-  # TODO: unit tests
   def in_pair_with? other_member
     Pair.active.with_member_ids(id, other_member.id).exists?
   end

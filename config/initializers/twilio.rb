@@ -12,4 +12,3 @@ class TwilioClient
     @@t.account.sms.messages.delay.create(from: from_number, to: to_number, body: message)
   end
 end
-

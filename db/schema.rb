@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150329073258) do
+ActiveRecord::Schema.define(version: 20150403230734) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -64,6 +64,23 @@ ActiveRecord::Schema.define(version: 20150329073258) do
   add_index "pairs", ["group_id"], name: "index_pairs_on_group_id", using: :btree
   add_index "pairs", ["member_1_id"], name: "index_pairs_on_member_1_id", using: :btree
   add_index "pairs", ["member_2_id"], name: "index_pairs_on_member_2_id", using: :btree
+
+  create_table "sms", force: :cascade do |t|
+    t.integer  "from_id"
+    t.string   "from_type"
+    t.integer  "to_id"
+    t.string   "to_type"
+    t.string   "from_number"
+    t.string   "to_number"
+    t.string   "message"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "sms", ["from_id", "from_type"], name: "index_sms_on_from_id_and_from_type", using: :btree
+  add_index "sms", ["from_number"], name: "index_sms_on_from_number", using: :btree
+  add_index "sms", ["to_id", "to_type"], name: "index_sms_on_to_id_and_to_type", using: :btree
+  add_index "sms", ["to_number"], name: "index_sms_on_to_number", using: :btree
 
   create_table "users", force: :cascade do |t|
     t.string   "email",                  limit: 255, default: "",                           null: false
