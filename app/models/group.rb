@@ -60,6 +60,10 @@ class Group < ActiveRecord::Base
     name
   end
 
+  def add_member m
+    GroupMembership.find_or_create_by(group_id: id, member_id: m.id)
+  end
+
   ##############################################################################
   # PRIVATE METHODS
   ##############################################################################
