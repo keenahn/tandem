@@ -6,7 +6,7 @@ class SmsController < ApplicationController
   attr_accessor :message
 
   def receive
-    return false unless (@@debug || TandemSms.valid_request?(params))
+    return false unless (@@debug || valid_request?(params))
 
     tandem_number = params["To"][-10..10]
     raise t("tandem.errors.no_from_number_provided") unless params["From"] # TODO: fix and internationalize
@@ -16,12 +16,12 @@ class SmsController < ApplicationController
     # Find the member based on their phone number
     # TODO: what if the same phone number is used for members who belong in multiple groups?
     member = Member.find_by_phone_number(member_number)
-    return TandemSms.twiml(t("tandem.messages.phone_number_not_in_system", member_number: member_number)) unless member
-    return TandemSms.twiml(t("tandem.messages.phone_number_unsubscribed", member_number: member_number)) if member.unsubscribed?
+    return twiml(t("tandem.messages.phone_number_not_in_system")) unless member
+    return twiml(t("tandem.messages.phone_number_unsubscribed")) if member.unsubscribed?
 
     # Find the pair, since they are uniquely identified by member_number, tandem_number
-    pair   = Pair.find_by_member_and_tandem_number(member_number, tandem_number)
-    return TandemSms.twiml(t("tandem.messages.pair_not_found", member_number: member_number, tandem_number: tandem_number)) unless pair
+    pair = Pair.find_by_member_id_and_tandem_number member.id, tandem_number
+    return twiml(t("tandem.messages.pair_not_found", member_number: member_number, tandem_number: tandem_number)) unless pair
 
     # Get the date in the member's timezone
     local_date = member.local_date
@@ -50,10 +50,19 @@ class SmsController < ApplicationController
     end
     return handle_unsubscribe if parsed_body.matches_unsubscribe?
     handle_pass_through
-  end
-
 
     render nothing: true, status: 200, content_type: "text/html"
   end
 
-end # close TwilioController
+  # Just testing. It works!
+  # def index
+  #   twiml("Hello World")
+  # end
+
+  private
+
+  def twiml msg
+    render partial: "twilio/message", locals: {msg: msg}
+  end
+
+end # close SmsController

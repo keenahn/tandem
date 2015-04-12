@@ -63,6 +63,11 @@ class Pair < ActiveRecord::Base
   # CLASS METHODS
   ##############################################################################
 
+  # TODO: unit test
+  def self.find_by_member_id_and_tandem_number m_id, t_number
+    Pair.active.with_member_id(m_id).where(tandem_number: t_number).first
+  end
+
   ##############################################################################
   # INSTANCE METHODS
   ##############################################################################
@@ -81,6 +86,7 @@ class Pair < ActiveRecord::Base
   def set_defaults
     self.activity ||= group.activity
     self.active = true
+    self.tandem_number ||= ENV["DEFAULT_FROM_NUMBER"]
   end
 
 

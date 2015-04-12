@@ -31,4 +31,8 @@ Rails.application.routes.draw do
     get    "account" => "users/registrations#edit",   as: :edit_user
   end
 
+  # Just for testing
+  get "sms" => "sms#index"
+
+
 end

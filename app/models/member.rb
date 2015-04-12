@@ -81,6 +81,12 @@ class Member < ActiveRecord::Base
     Pair.active.with_member_ids(id, other_member.id).exists?
   end
 
+  # TODO: unit tests
+  def unsubscribed?
+    #TODO
+    false
+  end
+
   ##############################################################################
   # PRIVATE METHODS
   ##############################################################################

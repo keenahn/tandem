@@ -30,6 +30,7 @@ gem "select2-rails"               # Better dropdowns for forms
 gem "simple_form"                 # simple form generator
 gem "turbolinks"                  # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
 gem "twilio-ruby"                 # Twilio
+gem "twiml_template"              # Easy TWIML views
 gem "tzinfo-data"                 # TZInfo::Data contains data from the IANA Time Zone database packaged as Ruby modules for use with TZInfo.
 gem "uglifier"                    # Use Uglifier as compressor for JavaScript assets
 gem "validates_formatting_of"     # Simple validators (like for email) https://github.com/mattdbridges/validates_formatting_of
