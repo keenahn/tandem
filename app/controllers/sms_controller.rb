@@ -1,9 +1,11 @@
 # Controller for receiving SMS's
 class SmsController < ApplicationController
 
-  @@debug = false
+  @@debug = true
 
   attr_accessor :message
+
+  skip_before_action :verify_authenticity_token, only: [:receive]
 
   def receive
     return false unless (@@debug || valid_request?(params))
@@ -15,13 +17,22 @@ class SmsController < ApplicationController
 
     # Find the member based on their phone number
     # TODO: what if the same phone number is used for members who belong in multiple groups?
-    member = Member.find_by_phone_number(member_number)
-    return twiml(t("tandem.messages.phone_number_not_in_system")) unless member
-    return twiml(t("tandem.messages.phone_number_unsubscribed")) if member.unsubscribed?
+    @member = Member.find_by_phone_number(member_number)
+    return twiml(t("tandem.messages.phone_number_not_in_system")) unless @member
+    return twiml(t("tandem.messages.phone_number_unsubscribed")) if @member.unsubscribed?
 
     # Find the pair, since they are uniquely identified by member_number, tandem_number
-    pair = Pair.find_by_member_id_and_tandem_number member.id, tandem_number
-    return twiml(t("tandem.messages.pair_not_found", member_number: member_number, tandem_number: tandem_number)) unless pair
+    @pair = Pair.find_by_member_id_and_tandem_number @member.id, tandem_number
+    return twiml(t("tandem.messages.pair_not_found", member_number: member_number, tandem_number: tandem_number)) unless @pair
+
+    return handle_pass_through @member, @pair, params["Body"]
+
+
+
+    # TODO: rest of the logic
+
+
+
 
     # Get the date in the member's timezone
     local_date = member.local_date
@@ -61,8 +72,24 @@ class SmsController < ApplicationController
 
   private
 
+  # TODO: unit tests
+  def valid_request? params
+    # TODO
+    true
+  end
+
   def twiml msg
     render partial: "twilio/message", locals: {msg: msg}
+  end
+
+  def handle_pass_through member, pair, body
+    other_member = pair.other_member(member)
+    Sms.create(
+      from: member,
+      to: other_member,
+      message: body
+    )
+    render nothing: true, status: 200, content_type: "text/html"
   end
 
 end # close SmsController

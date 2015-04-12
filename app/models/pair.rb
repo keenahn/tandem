@@ -77,6 +77,13 @@ class Pair < ActiveRecord::Base
     Member.where(id: [member_1_id, member_2_id])
   end
 
+  # TODO: unit tests
+  def other_member mem
+    return nil unless (member_1.id == mem.id || member_2.id == mem.id)
+    return member_2 if member_1.id == mem.id
+    member_1
+  end
+
   ##############################################################################
   # PRIVATE METHODS
   ##############################################################################

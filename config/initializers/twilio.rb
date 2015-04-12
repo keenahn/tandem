@@ -9,6 +9,6 @@ class TwilioClient
 
   def self.sms to_number, message, from_number = nil
     from_number ||= DEFAULT_FROM_NUMBER
-    @@t.account.sms.messages.delay.create(from: from_number, to: to_number, body: message)
+    @@t.account.sms.messages.create(from: from_number, to: to_number, body: message)
   end
 end

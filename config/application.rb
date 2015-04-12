@@ -41,6 +41,8 @@ module Tandem
     #   g.test_framework  :test_unit, fixture: true
     # end
 
+    config.active_job.queue_adapter = :delayed_job
+
   end
 
 end

@@ -11,6 +11,7 @@ gem "bootstrap-sass-extras"       # Use sass for boostrap
 gem "bundler"                     # Package manager
 gem "coffee-rails"                # Use CoffeeScript for .js.coffee assets and views
 gem "dalli"                       # memcached
+gem "delayed_job_active_record"   # Delayed Job
 gem "devise"                      # Simple user system
 gem "haml"                        # Use haml for views and generators
 gem "haml-rails"                  # for haml generators
@@ -67,6 +68,7 @@ group :development, :test do
   gem "faker"                     # generate random data in different formats
   gem "database_cleaner"          # clean database after tests
   gem "dotenv-rails"              # for the .env file
+  gem "httparty"                  # HTTP get and post testing
 end
 
 group :doc do

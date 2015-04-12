@@ -33,6 +33,7 @@ Rails.application.routes.draw do
 
   # Just for testing
   get "sms" => "sms#index"
+  post "sms" => "sms#receive"
 
 
 end

@@ -14,7 +14,7 @@ class Sms < ActiveRecord::Base
   belongs_to :from, polymorphic: true
 
   after_validation :clean_params
-  after_create :send_sms
+  after_create :delay_send_sms
 
   MAX_LENGTH = 160
 
@@ -26,6 +26,10 @@ class Sms < ActiveRecord::Base
 
   def can_send?
     from.can_message? to
+  end
+
+  def delay_send_sms
+    SendSmsJob.perform_later self
   end
 
   def send_sms
