@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150403230734) do
+ActiveRecord::Schema.define(version: 20150412183537) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -56,7 +56,8 @@ ActiveRecord::Schema.define(version: 20150403230734) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "activity"
-    t.boolean  "active",      default: true, null: false
+    t.boolean  "active",        default: true, null: false
+    t.string   "tandem_number"
   end
 
   add_index "pairs", ["active"], name: "index_pairs_on_active", using: :btree
@@ -64,6 +65,8 @@ ActiveRecord::Schema.define(version: 20150403230734) do
   add_index "pairs", ["group_id"], name: "index_pairs_on_group_id", using: :btree
   add_index "pairs", ["member_1_id"], name: "index_pairs_on_member_1_id", using: :btree
   add_index "pairs", ["member_2_id"], name: "index_pairs_on_member_2_id", using: :btree
+  add_index "pairs", ["tandem_number", "member_1_id"], name: "index_pairs_on_tandem_number_and_member_1_id", using: :btree
+  add_index "pairs", ["tandem_number", "member_2_id"], name: "index_pairs_on_tandem_number_and_member_2_id", using: :btree
 
   create_table "sms", force: :cascade do |t|
     t.integer  "from_id"
