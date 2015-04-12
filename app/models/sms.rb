@@ -22,6 +22,11 @@ class Sms < ActiveRecord::Base
     Sms.config.dry_run
   end
 
+  def send_sms
+    return Rails.logger.info(inspect) if dry_run?
+    TwilioClient.sms to_number, message
+  end
+
   private
 
   def can_send?
@@ -29,12 +34,8 @@ class Sms < ActiveRecord::Base
   end
 
   def delay_send_sms
-    SendSmsJob.perform_later self
-  end
-
-  def send_sms
     return Rails.logger.info(inspect) if dry_run?
-    TwilioClient.sms to_number, message
+    SendSmsJob.perform_later self
   end
 
   def clean_params
