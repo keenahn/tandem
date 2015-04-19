@@ -1,10 +1,9 @@
-ruby "2.2.0"
-
+ruby "2.2.2"
 source "https://rubygems.org"
 
 gem "people", github: "keenahn/people" # for parsing names. Using my fork because the old one is not maintained
 
-gem "rails", "4.2"                # rails! For edge Rails instead, use: gem "rails", github: "rails/rails"
+gem "rails", "4.2.1"              # rails! For edge Rails instead, use: gem "rails", github: "rails/rails"
 
 gem "bootstrap-sass"              # Use sass for boostrap
 gem "bootstrap-sass-extras"       # Use sass for boostrap
