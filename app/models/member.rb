@@ -7,6 +7,7 @@ class Member < ActiveRecord::Base
 
   include Concerns::ActiveRecordExtensions
   include Concerns::SmsableMixin
+  include Concerns::ActiveInactiveMixin
 
   ##############################################################################
   # CONSTANTS
@@ -41,6 +42,7 @@ class Member < ActiveRecord::Base
   ##############################################################################
 
   after_destroy :destroy_pairs
+  after_save :deactivate_pairs
 
   before_validation(on: :create) do
     set_defaults
@@ -50,7 +52,18 @@ class Member < ActiveRecord::Base
   # SCOPES
   ##############################################################################
 
-  scope :in_group, ->(group_id) { g = Group.find_by_id group_id ; g.members if g }
+  scope :in_group, ->(group_id) {
+    g = Group.find_by_id group_id
+    return g.members if g
+    none
+  }
+
+  # TODO: move to class method?
+  scope :has_active_pair, ->{
+    subq_1 = Pair.active.select(:member_1_id).to_sql
+    subq_2 = Pair.active.select(:member_2_id).to_sql
+    where("id IN ((#{subq_1}) UNION (#{subq_2}))")
+  }
 
   ##############################################################################
   # CLASS METHODS
@@ -112,6 +125,11 @@ class Member < ActiveRecord::Base
   # TODO: unit tests
   def destroy_pairs
     pairs.destroy_all
+  end
+
+  # TODO: unit tests
+  def deactivate_pairs
+    pairs.each{ |x| x.deactivate! }
   end
 
 end

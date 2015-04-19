@@ -6,6 +6,7 @@ class Pair < ActiveRecord::Base
   ##############################################################################
 
   include Concerns::ActiveRecordExtensions
+  include Concerns::ActiveInactiveMixin
 
   ##############################################################################
   # CONSTANTS
@@ -37,7 +38,7 @@ class Pair < ActiveRecord::Base
   validates :member_2, presence: true
   validates :group, presence: true
   validates :activity, presence: true
-  validates :active, presence: true
+
 
 
   ##############################################################################
@@ -64,8 +65,7 @@ class Pair < ActiveRecord::Base
       m1_id, m2_id, m2_id, m1_id)
   }
 
-  scope :active,   ->{ where(active: true)  }
-  scope :inactive, ->{ where(active: false) }
+
 
   ##############################################################################
   # CLASS METHODS
@@ -92,32 +92,7 @@ class Pair < ActiveRecord::Base
     member_1
   end
 
-  # TODO: unit tests
-  def activate
-    self.active = true
-  end
 
-  # TODO: unit tests
-  def deactivate
-    self.active = false
-  end
-
-  # TODO: unit tests
-  def activate!
-    activate
-    save
-  end
-
-  # TODO: unit tests
-  def deactivate!
-    deactivate
-    save
-  end
-
-  # TODO: unit tests
-  def active?
-    active ? true : false
-  end
 
   ##############################################################################
   # PRIVATE METHODS
