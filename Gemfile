@@ -8,6 +8,7 @@ gem "rails", "4.2.1"              # rails! For edge Rails instead, use: gem "rai
 gem "bootstrap-sass"              # Use sass for boostrap
 gem "bootstrap-sass-extras"       # Use sass for boostrap
 gem "bundler"                     # Package manager
+gem "clockwork"                   # Cron replacement, used for scheduling daily tasks and reschedules
 gem "coffee-rails"                # Use CoffeeScript for .js.coffee assets and views
 gem "dalli"                       # memcached
 gem "delayed_job_active_record"   # Delayed Job
