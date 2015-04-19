@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150419184722) do
+ActiveRecord::Schema.define(version: 20150419224034) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -84,8 +84,16 @@ ActiveRecord::Schema.define(version: 20150419184722) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "activity"
-    t.boolean  "active",        default: true, null: false
+    t.boolean  "active",            default: true, null: false
     t.string   "tandem_number"
+    t.string   "time_zone"
+    t.time     "reminder_time_mon"
+    t.time     "reminder_time_tue"
+    t.time     "reminder_time_wed"
+    t.time     "reminder_time_thu"
+    t.time     "reminder_time_fri"
+    t.time     "reminder_time_sat"
+    t.time     "reminder_time_sun"
   end
 
   add_index "pairs", ["active"], name: "index_pairs_on_active", using: :btree
