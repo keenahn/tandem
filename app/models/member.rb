@@ -26,6 +26,7 @@ class Member < ActiveRecord::Base
 
   has_many :groups, through: :group_memberships
   has_many :group_memberships, dependent: :destroy
+  has_many :checkins, dependent: :destroy
 
   ##############################################################################
   # VALIDATIONS
@@ -33,6 +34,7 @@ class Member < ActiveRecord::Base
 
   # TODO: validate first and last name
   # TODO: validate phone number presence and format
+  # TODO: validate presence of timezone
 
   ##############################################################################
   # CALLBACKS
@@ -85,6 +87,16 @@ class Member < ActiveRecord::Base
   def unsubscribed?
     #TODO
     false
+  end
+
+  # TODO: unit tests
+  def local_time
+    Time.now.in_time_zone(time_zone)
+  end
+
+  # TODO: unit tests
+  def local_date
+    local_time.to_date
   end
 
   ##############################################################################

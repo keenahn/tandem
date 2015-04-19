@@ -11,10 +11,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150412234705) do
+ActiveRecord::Schema.define(version: 20150419184722) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "checkins", force: :cascade do |t|
+    t.integer  "member_id"
+    t.integer  "pair_id"
+    t.date     "local_date"
+    t.datetime "done_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  add_index "checkins", ["member_id", "local_date"], name: "index_checkins_on_member_id_and_local_date", using: :btree
+  add_index "checkins", ["pair_id", "member_id", "local_date"], name: "index_checkins_on_pair_id_and_member_id_and_local_date", unique: true, using: :btree
 
   create_table "delayed_jobs", force: :cascade do |t|
     t.integer  "priority",   default: 0, null: false
