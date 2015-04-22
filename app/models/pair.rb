@@ -12,6 +12,21 @@ class Pair < ActiveRecord::Base
   # CONSTANTS
   ##############################################################################
 
+  WEEKEND_REMINDER_TIME_FIELDS = [
+    :reminder_time_sat,
+    :reminder_time_sun,
+  ]
+
+  WEEKDAY_REMINDER_TIME_FIELDS = [
+    :reminder_time_mon,
+    :reminder_time_tue,
+    :reminder_time_wed,
+    :reminder_time_thu,
+    :reminder_time_fri,
+  ]
+
+  ALL_REMINDER_TIME_FIELDS = WEEKDAY_REMINDER_TIME_FIELDS + WEEKEND_REMINDER_TIME_FIELDS
+
   ##############################################################################
   # MACROS
   ##############################################################################
@@ -40,7 +55,6 @@ class Pair < ActiveRecord::Base
   validates :activity, presence: true
 
 
-
   ##############################################################################
   # CALLBACKS
   ##############################################################################
@@ -63,6 +77,12 @@ class Pair < ActiveRecord::Base
     where("(#{table_name}.member_1_id = ? AND #{table_name}.member_2_id = ?) OR
            (#{table_name}.member_1_id = ? AND #{table_name}.member_2_id = ?)",
       m1_id, m2_id, m2_id, m1_id)
+  }
+
+  scope :in_group, ->(group_id) {
+    g = Group.find_by_id group_id
+    return g.pairs if g
+    none
   }
 
 
@@ -93,6 +113,20 @@ class Pair < ActiveRecord::Base
   end
 
 
+  # TODO: unit tests
+  def set_all_reminder_times t
+    ALL_REMINDER_TIME_FIELDS.each{ |f| self[f] = t }
+  end
+
+  # TODO: unit tests
+  def set_weekday_reminder_time t
+    WEEKDAY_REMINDER_TIME_FIELDS.each{ |f| self[f] = t }
+  end
+
+  # TODO: unit tests
+  def set_weekend_reminder_time t
+    WEEKEND_REMINDER_TIME_FIELDS.each{ |f| self[f] = t }
+  end
 
   ##############################################################################
   # PRIVATE METHODS
@@ -101,8 +135,9 @@ class Pair < ActiveRecord::Base
   private
 
   def set_defaults
-    self.activity ||= group.activity
-    self.active = true
+    self.activity      ||= group.activity
+    self.time_zone     ||= group.time_zone
+    self.active          = true
     self.tandem_number ||= ENV["DEFAULT_FROM_NUMBER"]
   end
 
