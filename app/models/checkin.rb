@@ -47,6 +47,7 @@ class Checkin < ActiveRecord::Base
   # CLASS METHODS
   ##############################################################################
 
+  # TODO: unit tests
   def self.create_empty_checkins
     puts "Creating empty checkins"
 
