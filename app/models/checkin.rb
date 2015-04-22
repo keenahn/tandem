@@ -24,7 +24,6 @@ class Checkin < ActiveRecord::Base
   belongs_to :member
   belongs_to :pair
 
-
   ##############################################################################
   # VALIDATIONS
   ##############################################################################
@@ -32,7 +31,6 @@ class Checkin < ActiveRecord::Base
   validates :member,     presence: true
   validates :pair,       presence: true
   validates :local_date, presence: true
-
   validates :local_date, uniqueness: {scope: [:member_id, :pair_id]}
 
   ##############################################################################
