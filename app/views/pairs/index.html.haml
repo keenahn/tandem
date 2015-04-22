@@ -24,4 +24,5 @@
 
 %br
 
-= link_to t('.new', default: t("helpers.links.new")), new_pair_path, class: "btn btn-primary"
+= link_to t('.new', default: t("helpers.links.new")), @group ? new_group_pair_path : new_pair_path, class: "btn btn-primary"
+

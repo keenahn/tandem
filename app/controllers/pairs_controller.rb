@@ -5,11 +5,16 @@
 class PairsController < ApplicationController
 
   before_action :set_pair, only: [:show, :edit, :update, :destroy]
+  before_action :set_group
 
   # GET /pairs
   # GET /pairs.json
   def index
-    @pairs = Pair.all
+    if params[:group_id]
+      @pairs = Pair.in_group params[:group_id]
+    else
+      @pairs = Pair.all
+    end
   end
 
   # GET /pairs/1
@@ -20,6 +25,7 @@ class PairsController < ApplicationController
   # GET /pairs/new
   def new
     @pair = Pair.new
+
   end
 
   # GET /pairs/1/edit
@@ -30,6 +36,7 @@ class PairsController < ApplicationController
   # POST /pairs.json
   def create
     @pair = Pair.new(pair_params)
+    @pair.set_all_reminder_times(params[:reminder_time])
 
     respond_to do |format|
       if @pair.save
@@ -71,6 +78,10 @@ class PairsController < ApplicationController
   # Use callbacks to share common setup or constraints between actions.
   def set_pair
     @pair = Pair.find(params[:id])
+  end
+
+  def set_group
+    @group = Group.find_by_id params[:group_id] # if nested under group
   end
 
   # Never trust parameters from the scary internet, only allow the white list through.

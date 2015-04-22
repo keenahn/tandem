@@ -6,10 +6,12 @@
         - @pair.errors.full_messages.each do |msg|
           %li= msg
 
-  .field
-    = f.label :group_id
-    = @pair.group
-    -# = collection_select :pair, :group_id, Group.all, :id, :name, {}, { class: "select2" }
+  = f.hidden_field :group_id, value: @group ? @group.id : nil
+
+  -#.field
+  -#  = f.label :group_id
+  -#  = @pair.group
+  -#  -# = collection_select :pair, :group_id, Group.all, :id, :name, {}, { class: "select2" }
 
     -#= f.collection_select(:group, Group.all, :id, :name)
   .field
@@ -19,6 +21,11 @@
   .field
     = f.label :member_2_id
     = collection_select :pair, :member_2_id, Member.all, :id, :name, {}, { class: "select2" }
+    -#= f.collection_select(:member_2, Member.all, :id, :name)
+
+  .field
+    = label_tag :reminder_time
+    = text_field_tag :reminder_time
     -#= f.collection_select(:member_2, Member.all, :id, :name)
 
 
