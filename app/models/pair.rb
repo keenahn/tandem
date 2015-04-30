@@ -135,9 +135,9 @@ class Pair < ActiveRecord::Base
   private
 
   def set_defaults
+    self.active          = true
     self.activity      ||= group.activity
     self.time_zone     ||= group.time_zone
-    self.active          = true
     self.tandem_number ||= ENV["DEFAULT_FROM_NUMBER"]
   end
 

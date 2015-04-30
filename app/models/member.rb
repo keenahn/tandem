@@ -44,6 +44,8 @@ class Member < ActiveRecord::Base
   after_destroy :destroy_pairs
   after_save :deactivate_pairs
 
+  before_validation :clean_phone
+
   before_validation(on: :create) do
     set_defaults
   end
@@ -118,8 +120,14 @@ class Member < ActiveRecord::Base
 
   private
 
+  def clean_phone
+    self.phone_number = Phoner::Phone.parse(phone_number).to_s if phone_number
+    true
+  end
+
   def set_defaults
     self.active = true
+    true
   end
 
   # TODO: unit tests
