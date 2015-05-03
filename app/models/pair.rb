@@ -53,6 +53,7 @@ class Pair < ActiveRecord::Base
   validates :member_2, presence: true
   validates :group, presence: true
   validates :activity, presence: true
+  validate :members_different
 
 
   ##############################################################################
@@ -128,6 +129,11 @@ class Pair < ActiveRecord::Base
     WEEKEND_REMINDER_TIME_FIELDS.each{ |f| self[f] = t }
   end
 
+  # TODO: unit tests
+  def reminder_time
+    reminder_time_mon
+  end
+
   ##############################################################################
   # PRIVATE METHODS
   ##############################################################################
@@ -136,9 +142,15 @@ class Pair < ActiveRecord::Base
 
   def set_defaults
     self.active          = true
-    self.activity      ||= group.activity
-    self.time_zone     ||= group.time_zone
-    self.tandem_number ||= ENV["DEFAULT_FROM_NUMBER"]
+    self.tandem_number   ||= Phoner::Phone.parse(TwilioClient::DEFAULT_FROM_NUMBER + "").to_s
+    if group
+      self.activity      ||= group.activity
+      self.time_zone     ||= group.time_zone
+    end
+  end
+
+  def members_different
+    errors.add(:base, I18n.t("tandem.errors.members_not_different")) if member_1_id == member_2_id
   end
 
 

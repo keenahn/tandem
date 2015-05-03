@@ -1,3 +1,4 @@
+-# @group = @pair.group
 = form_for @pair do |f|
   - if @pair.errors.any?
     #error_explanation
@@ -6,27 +7,32 @@
         - @pair.errors.full_messages.each do |msg|
           %li= msg
 
-  = f.hidden_field :group_id, value: @group ? @group.id : nil
+  = f.hidden_field :group_id, value: @group.id
 
-  -#.field
-  -#  = f.label :group_id
-  -#  = @pair.group
-  -#  -# = collection_select :pair, :group_id, Group.all, :id, :name, {}, { class: "select2" }
-
-    -#= f.collection_select(:group, Group.all, :id, :name)
   .field
     = f.label :member_1_id
-    = collection_select :pair, :member_1_id, Member.all, :id, :name, {}, { class: "select2" }
-    -#= f.collection_select(:member_1, Member.all, :id, :name)
+    = collection_select :pair, :member_1_id, @group ? @group.members : Member.all, :id, :name, {}, { class: "select2" }
+
   .field
     = f.label :member_2_id
-    = collection_select :pair, :member_2_id, Member.all, :id, :name, {}, { class: "select2" }
-    -#= f.collection_select(:member_2, Member.all, :id, :name)
+    = collection_select :pair, :member_2_id,  @group ? @group.members : Member.all, :id, :name, {}, { class: "select2" }
+
+  .field
+    = f.label :activity
+    = collection_select :pair, :activity, Tandem::Activity::ACTIVITIES, :to_s, :to_s, {}, { class: "select2" }
+
+  .field
+    = f.label :active
+    = f.check_box :active
+
+  .field
+    = f.label :time_zone
+    = time_zone_select( :pair, :time_zone, ActiveSupport::TimeZone.us_zones, default: Tandem::Consts::DEFAULT_TIMEZONE)
 
   .field
     = label_tag :reminder_time
-    = text_field_tag :reminder_time
-    -#= f.collection_select(:member_2, Member.all, :id, :name)
+    = text_field_tag :reminder_time, Tandem::Utils::short_time(@pair.reminder_time), class: "time-picker"
+    -# TODO: make a time select widget
 
 
   .actions

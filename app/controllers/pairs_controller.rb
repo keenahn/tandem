@@ -5,7 +5,7 @@
 class PairsController < ApplicationController
 
   before_action :set_pair, only: [:show, :edit, :update, :destroy]
-  before_action :set_group
+  before_action :set_group, except: [:create]
 
   # GET /pairs
   # GET /pairs.json
@@ -25,7 +25,6 @@ class PairsController < ApplicationController
   # GET /pairs/new
   def new
     @pair = Pair.new
-
   end
 
   # GET /pairs/1/edit
@@ -36,11 +35,12 @@ class PairsController < ApplicationController
   # POST /pairs.json
   def create
     @pair = Pair.new(pair_params)
+    @group = @pair.group
     @pair.set_all_reminder_times(params[:reminder_time])
 
     respond_to do |format|
       if @pair.save
-        format.html { redirect_to @pair, notice: "Pair was successfully created." }
+        format.html { redirect_to group_pairs_path(@pair.group), notice: "Pair was successfully created." }
         format.json { render :show, status: :created, location: @pair }
       else
         format.html { render :new }
@@ -53,8 +53,11 @@ class PairsController < ApplicationController
   # PATCH/PUT /pairs/1.json
   def update
     respond_to do |format|
-      if @pair.update(pair_params)
-        format.html { redirect_to @pair, notice: "Pair was successfully updated." }
+
+      @pair.set_all_reminder_times(params[:reminder_time])
+      @pair.update_attributes(pair_params)
+      if @pair.save
+        format.html { redirect_to group_pairs_path(@pair.group), notice: "Pair was successfully updated." }
         format.json { render :show, status: :ok, location: @pair }
       else
         format.html { render :edit }
@@ -82,12 +85,21 @@ class PairsController < ApplicationController
 
   def set_group
     @group = Group.find_by_id params[:group_id] # if nested under group
+    @group = @pair.group if @pair && !@group
   end
 
   # Never trust parameters from the scary internet, only allow the white list through.
   def pair_params
     # params[:pair]
-    params.require(:pair).permit(:group_id, :member_1_id, :member_2_id)
+    params.require(:pair).permit(
+      :active,
+      :activity,
+      :group_id,
+      :member_1_id,
+      :member_2_id,
+      :time_zone,
+    )
   end
 
 end
+

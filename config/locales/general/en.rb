@@ -10,6 +10,7 @@
       },
       errors: {
         no_from_number_provided: "No 'From' number provided",
+        members_not_different: "Members in pair must be different"
       },
       helpers: {
         bulk_import: "Bulk Import"
