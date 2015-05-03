@@ -5,7 +5,7 @@ class AddTandemNumberToPairs < ActiveRecord::Migration
     add_index :pairs, [:tandem_number, :member_1_id]
     add_index :pairs, [:tandem_number, :member_2_id]
 
-    Pair.update_all(tandem_number: ENV["TWILIO_DEFAULT_FROM_NUMBER"])
+    Pair.update_all(tandem_number: TwilioClient::DEFAULT_FROM_NUMBER)
   end
 
   def down
