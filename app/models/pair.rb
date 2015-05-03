@@ -7,6 +7,7 @@ class Pair < ActiveRecord::Base
 
   include Concerns::ActiveRecordExtensions
   include Concerns::ActiveInactiveMixin
+  include Concerns::LocalTimeMixin
 
   ##############################################################################
   # CONSTANTS

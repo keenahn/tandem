@@ -8,6 +8,7 @@ class Member < ActiveRecord::Base
   include Concerns::ActiveRecordExtensions
   include Concerns::SmsableMixin
   include Concerns::ActiveInactiveMixin
+  include Concerns::LocalTimeMixin
 
   ##############################################################################
   # CONSTANTS
@@ -102,16 +103,6 @@ class Member < ActiveRecord::Base
   def unsubscribed?
     #TODO
     false
-  end
-
-  # TODO: unit tests
-  def local_time
-    Time.now.in_time_zone(time_zone)
-  end
-
-  # TODO: unit tests
-  def local_date
-    local_time.to_date
   end
 
   ##############################################################################

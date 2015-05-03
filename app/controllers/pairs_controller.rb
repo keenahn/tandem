@@ -7,8 +7,6 @@ class PairsController < ApplicationController
   before_action :set_pair, only: [:show, :edit, :update, :destroy]
   before_action :set_group, except: [:create]
 
-  # GET /pairs
-  # GET /pairs.json
   def index
     if params[:group_id]
       @pairs = Pair.in_group params[:group_id]
@@ -17,24 +15,18 @@ class PairsController < ApplicationController
     end
   end
 
-  # GET /pairs/1
-  # GET /pairs/1.json
   def show
   end
 
-  # GET /pairs/new
   def new
     @pair = Pair.new
   end
 
-  # GET /pairs/1/edit
   def edit
   end
 
-  # POST /pairs
-  # POST /pairs.json
   def create
-    @pair = Pair.new(pair_params)
+    @pair  = Pair.new(pair_params)
     @group = @pair.group
     @pair.set_all_reminder_times(params[:reminder_time])
 
@@ -49,8 +41,6 @@ class PairsController < ApplicationController
     end
   end
 
-  # PATCH/PUT /pairs/1
-  # PATCH/PUT /pairs/1.json
   def update
     respond_to do |format|
 
@@ -66,8 +56,7 @@ class PairsController < ApplicationController
     end
   end
 
-  # DELETE /pairs/1
-  # DELETE /pairs/1.json
+
   def destroy
     @pair.destroy
     respond_to do |format|
@@ -85,12 +74,11 @@ class PairsController < ApplicationController
 
   def set_group
     @group = Group.find_by_id params[:group_id] # if nested under group
-    @group = @pair.group if @pair && !@group
+    @group = @pair.group if @pair && !@group    # If not nested, but we're given a pair
   end
 
   # Never trust parameters from the scary internet, only allow the white list through.
   def pair_params
-    # params[:pair]
     params.require(:pair).permit(
       :active,
       :activity,
