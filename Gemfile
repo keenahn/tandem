@@ -13,6 +13,7 @@ gem "coffee-rails"                # Use CoffeeScript for .js.coffee assets and v
 gem "dalli"                       # memcached
 gem "delayed_job_active_record"   # Delayed Job
 gem "devise"                      # Simple user system
+gem "flag_shih_tzu"               # Bitfield flags
 gem "haml"                        # Use haml for views and generators
 gem "haml-rails"                  # for haml generators
 gem "i18n"                        # translation

@@ -18,6 +18,30 @@ class Member < ActiveRecord::Base
   # MACROS
   ##############################################################################
 
+
+  # For Flag Shih Tzu
+  # Tracks what kind of messages the member has already seen
+  # We use this to know what messgae to send them next
+  has_flags 1 => :seen_first_reminder,
+            2 => :seen_second_reminder,
+            3 => :seen_first_other_reminder,
+            4 => :seen_second_other_reminder,
+            5 => :seen_first_yes_reply,
+            6 => :seen_second_yes_reply,
+            7 => :seen_first_other_yes_reply,
+            8 => :seen_second_other_yes_reply,
+            9 => :seen_first_reschedule_reply,
+           10 => :seen_second_reschedule_reply,
+           11 => :seen_first_other_reschedule,
+           12 => :seen_second_other_reschedule,
+           13 => :seen_first_no_reply,
+           14 => :seen_second_no_reply,
+           15 => :seen_first_other_no_reply,
+           16 => :seen_second_other_no_reply,
+           17 => :seen_first_both_no_reply,
+           18 => :seen_second_both_no_reply,
+           column: "message_flags"
+
   ##############################################################################
   # ATTRIBUTES
   ##############################################################################

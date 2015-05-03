@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150503033125) do
+ActiveRecord::Schema.define(version: 20150503200501) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -69,12 +69,13 @@ ActiveRecord::Schema.define(version: 20150503033125) do
   add_index "groups", ["owner_id"], name: "index_groups_on_owner_id", using: :btree
 
   create_table "members", force: :cascade do |t|
-    t.string   "name",         limit: 255
-    t.string   "phone_number", limit: 255
+    t.string   "name",          limit: 255
+    t.string   "phone_number",  limit: 255
     t.boolean  "active"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "time_zone",                default: "Pacific Time (US & Canada)"
+    t.string   "time_zone",                 default: "Pacific Time (US & Canada)"
+    t.integer  "message_flags",             default: 0,                            null: false
   end
 
   create_table "pairs", force: :cascade do |t|
