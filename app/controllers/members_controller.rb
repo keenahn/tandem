@@ -32,23 +32,21 @@ class MembersController < ApplicationController
   def edit
   end
 
-  # POST /members
-  # POST /members.json
-  # POST /group/:group_id/members
-  # POST /group/:group_id/members.json
+  # TODO: fix redirects
   def create
     params.delete(:group_id) if params[:group_id]
 
     @member = create_member_and_membership(member_params)
+
     respond_to do |format|
       format.html {
-        return render :new unless member_saved
+        return render :new unless @member
         # TODO: internationalize
         redirect_to(@member, notice: "Member was successfully created.")
       }
 
       format.json {
-        return render(json: @member.errors, status: :unprocessable_entity) unless member_saved
+        return render(json: @member.errors, status: :unprocessable_entity) unless @member
         render(:show, status: :created, location: @member)
       }
     end

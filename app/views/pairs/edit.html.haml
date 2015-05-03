@@ -1,6 +1,6 @@
 %h1 Editing pair
 
-= render 'form'
+= render "form", locals: {group: @group, pair: @pair}
 
 -# = link_to 'Show', @pair
 -# \|

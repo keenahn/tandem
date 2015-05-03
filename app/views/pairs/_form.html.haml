@@ -1,21 +1,21 @@
--# @group = @pair.group
-= form_for @pair do |f|
-  - if @pair.errors.any?
+-# group = pair.group
+= form_for pair do |f|
+  - if pair.errors.any?
     #error_explanation
-      %h2= "#{pluralize(@pair.errors.count, "error")} prohibited this pair from being saved:"
+      %h2= "#{pluralize(pair.errors.count, "error")} prohibited this pair from being saved:"
       %ul
-        - @pair.errors.full_messages.each do |msg|
+        - pair.errors.full_messages.each do |msg|
           %li= msg
 
-  = f.hidden_field :group_id, value: @group.id
+  = f.hidden_field :group_id, value: group.id
 
   .field
     = f.label :member_1_id
-    = collection_select :pair, :member_1_id, @group ? @group.members : Member.all, :id, :name, {}, { class: "select2" }
+    = collection_select :pair, :member_1_id, group ? group.members : Member.all, :id, :name, {}, { class: "select2" }
 
   .field
     = f.label :member_2_id
-    = collection_select :pair, :member_2_id,  @group ? @group.members : Member.all, :id, :name, {}, { class: "select2" }
+    = collection_select :pair, :member_2_id,  group ? group.members : Member.all, :id, :name, {}, { class: "select2" }
 
   .field
     = f.label :activity
@@ -31,7 +31,7 @@
 
   .field
     = label_tag :reminder_time
-    = text_field_tag :reminder_time, Tandem::Utils::short_time(@pair.reminder_time), class: "time-picker"
+    = text_field_tag :reminder_time, Tandem::Utils::short_time(pair.reminder_time), class: "time-picker"
     -# TODO: make a time select widget
 
 
