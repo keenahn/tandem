@@ -23,7 +23,7 @@ class Sms < ActiveRecord::Base
   end
 
   def send_sms
-    return Rails.logger.info(inspect) if dry_run?
+    return puts inspect if dry_run?
     TwilioClient.sms to_number, message
   end
 

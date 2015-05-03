@@ -27,6 +27,7 @@ class Group < ActiveRecord::Base
   has_many :members, through: :group_memberships, dependent: :destroy
   has_many :group_memberships, dependent: :destroy
   has_many :pairs, dependent: :destroy
+  has_many :reminders, through: :pairs
 
   ##############################################################################
   # VALIDATIONS

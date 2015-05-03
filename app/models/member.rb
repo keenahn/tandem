@@ -5,6 +5,8 @@ class Member < ActiveRecord::Base
   # INCLUDES
   ##############################################################################
 
+  include FlagShihTzu
+
   include Concerns::ActiveRecordExtensions
   include Concerns::SmsableMixin
   include Concerns::ActiveInactiveMixin
@@ -18,10 +20,11 @@ class Member < ActiveRecord::Base
   # MACROS
   ##############################################################################
 
-
   # For Flag Shih Tzu
   # Tracks what kind of messages the member has already seen
   # We use this to know what messgae to send them next
+  # Right now, we have three variants for each message for the
+  # first, second, and more than second time
   has_flags 1 => :seen_first_reminder,
             2 => :seen_second_reminder,
             3 => :seen_first_other_reminder,
@@ -128,6 +131,26 @@ class Member < ActiveRecord::Base
     #TODO
     false
   end
+
+
+  # TODO: unit tests
+  # Doesn't save
+  def increment_reminder_count
+    return true if seen_second_reminder?
+    if seen_first_reminder
+      self.seen_second_reminder = true
+    else
+      self.seen_first_reminder  = true
+    end
+  end
+
+  # TODO: unit tests
+  # Does save
+  def increment_reminder_count!
+    increment_reminder_count
+    save
+  end
+
 
   ##############################################################################
   # PRIVATE METHODS

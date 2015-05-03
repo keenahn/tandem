@@ -41,13 +41,14 @@ class Reminder < ActiveRecord::Base
 
   belongs_to :member
   belongs_to :pair
+  has_one    :group, through: :pair
 
   ##############################################################################
   # VALIDATIONS
   ##############################################################################
 
-  validates :member,     presence: true
-  validates :pair,       presence: true
+  validates :member, presence: true
+  validates :pair,   presence: true
 
   ##############################################################################
   # CALLBACKS
@@ -72,17 +73,74 @@ class Reminder < ActiveRecord::Base
   # INSTANCE METHODS
   ##############################################################################
 
+
   # TODO: unit tests
   def send_reminder
-    # TODO
-
-    # TODO: determine which text message(s) to send
-    # Send them
-
     puts "Sending #{self}"
+
+    # determine which text message(s) to send
+    message_strings = current_message_strings.split("\n")
+
+    # Send the messages using SMS
+    send_sms(message_strings)
+
+    member.increment_reminder_count!
+    mark_sent!
+  end
+
+
+  # TODO: unit tests
+  # Doesn't save
+  def mark_sent
     self.status = :sent
+  end
+
+  # TODO: unit tests
+  # Doessave
+  def mark_sent!
+    mark_sent
     save
   end
+
+
+  def send_sms message_strings
+    message_strings.each{|x|
+      Sms.create(
+        from:        group.owner,
+        from_number: pair.tandem_number,
+        to:          member,
+        to_number:   member.phone_number,
+        message:     x
+      )
+    }
+  end
+
+  # TODO: unit tests
+  def current_message_strings
+    message_template_name = current_message_template_name
+    I18n.t("tandem.messages.#{message_template_name}", activity_args)
+  end
+
+
+  # TODO: unit tests
+  def current_message_template_name
+    message_time = "post_second_time"
+    message_base = "reminder_simultaneous_same_activities"
+    if !member.seen_second_reminder?
+      message_time = "first_time"
+      message_time = "second_time" if member.seen_first_reminder?
+    end
+    "#{message_base}_#{message_time}"
+  end
+
+  # TODO: unit tests
+  def activity_args
+    activity_tenses = I18n.t("tandem.activities.#{pair.activity}")
+    Hash[activity_tenses.map{|k,v| ["activity_#{k}".to_sym, v]}]
+  end
+
+
+
 
   # TODO: unit tests
   def to_s

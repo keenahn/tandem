@@ -76,8 +76,9 @@ class User < ActiveRecord::Base
   # TODO: unit tests
   # used for sending "system" sms's (from reminders, nudges, etc)
   def can_message? o
-    return true if admin?
-    false
+    return true
+    # return true if admin?
+    # false
   end
 
   ##############################################################################

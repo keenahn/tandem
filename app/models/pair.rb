@@ -50,6 +50,7 @@ class Pair < ActiveRecord::Base
   belongs_to :member_1, class_name: "Member"
   belongs_to :member_2, class_name: "Member"
   has_many :checkins, dependent: :destroy
+  has_many :reminders
 
   ##############################################################################
   # VALIDATIONS

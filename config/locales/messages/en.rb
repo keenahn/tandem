@@ -11,7 +11,7 @@ class TandemStrings
               infinitive: "to meditate",
               noun: "meditation",
               past: "meditated",
-              present_particple: "meditating",
+              present_participle: "meditating",
               short_noun: "'tate",
               simple_present: "meditate",
             },
@@ -19,7 +19,7 @@ class TandemStrings
               infinitive: "to work out",
               noun: "working out",
               past: "worked out",
-              present_particple: "working out",
+              present_participle: "working out",
               short_noun: "'tate",
               simple_present: "work out",
             },
@@ -32,6 +32,9 @@ class TandemStrings
             masculine_object: "him",
             masculine_possessive: "his",
             masculine_subject: "he",
+            neutral_object: "they",
+            neutral_possessive: "their",
+            neutral_subject: "they",
           },
 
           messages: {
