@@ -9,7 +9,7 @@ module Clockwork
   end
 
   every(1.hour, "Create Empty Checkins", at: "**:43"){
-    CreateEmptyCheckinsJob.perform_later
+    CreateCheckinsAndRemindersJob.perform_later
     # Delayed::Job.enqueue(CreateEmptyCheckinsJob.new)
   }
 

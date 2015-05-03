@@ -47,22 +47,6 @@ class Checkin < ActiveRecord::Base
   # CLASS METHODS
   ##############################################################################
 
-  # TODO: unit tests
-  def self.create_empty_checkins
-    puts "Creating empty checkins"
-
-    # Runs once an hour thanks to Clockwork and DelayedJob
-    # This is necessary to catch all the different possible timezones
-
-    Member.has_active_pair.each{|m|
-      next unless m.local_time.hour == 0 # Run after midnight, locally
-      m.pairs.active.each{|p|
-        Checkin.create(member: m, pair: p)
-      }
-    }
-
-  end
-
 
   ##############################################################################
   # INSTANCE METHODS
