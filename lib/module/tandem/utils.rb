@@ -23,5 +23,10 @@ module Tandem
       t.strftime(Tandem::Consts::SHORT_TIME_FORMAT).strip
     end
 
+    def self.short_time_24 t
+      return nil unless t
+      t.strftime(Tandem::Consts::SHORT_TIME_24_FORMAT)
+    end
+
   end
 end

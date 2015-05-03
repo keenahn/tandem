@@ -13,6 +13,11 @@ class Pair < ActiveRecord::Base
   # CONSTANTS
   ##############################################################################
 
+  # All reminder times are LOCAL, based on the time_zone field
+  # They are stored in the database as pure time fields
+  # which Rails Interprets as UTC. This might be confusing, but it is better
+  # than the alternative
+
   WEEKEND_REMINDER_TIME_FIELDS = [
     :reminder_time_sat,
     :reminder_time_sun,
@@ -25,6 +30,7 @@ class Pair < ActiveRecord::Base
     :reminder_time_thu,
     :reminder_time_fri,
   ]
+
 
   ALL_REMINDER_TIME_FIELDS = WEEKDAY_REMINDER_TIME_FIELDS + WEEKEND_REMINDER_TIME_FIELDS
 
@@ -133,6 +139,15 @@ class Pair < ActiveRecord::Base
   # TODO: unit tests
   def reminder_time
     reminder_time_mon
+  end
+
+  def reminder_time_today
+    sym = "reminder_time_#{local_day_of_week_abbrev}".to_sym
+    Tandem::Utils.short_time_24(self[sym])
+  end
+
+  def next_reminder_time_utc
+    Tandem::Utils.parse_time_in_zone("#{local_date} #{reminder_time_today}", time_zone).utc
   end
 
   ##############################################################################

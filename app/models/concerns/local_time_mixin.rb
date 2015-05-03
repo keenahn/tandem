@@ -13,5 +13,13 @@ module Concerns
     def local_date
       local_time.to_date
     end
+
+    def local_day_of_week_abbrev
+      local_date.strftime("%a").downcase
+    end
+
+
+
+
   end
 end
