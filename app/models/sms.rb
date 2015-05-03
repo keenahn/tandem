@@ -38,10 +38,12 @@ class Sms < ActiveRecord::Base
     SendSmsJob.perform_later self
   end
 
+
+  # TODO: internationalize
   def clean_params
     self.from_number = from.try(:phone_number) unless from_number
-    self.to_number = to.try(:phone_number) unless to_number
-    self.message = message.squish
+    self.to_number   = to.try(:phone_number) unless to_number
+    self.message     = message.squish
 
     unless from_number && to_number
       errors[:base] << "From number or to number is missing"

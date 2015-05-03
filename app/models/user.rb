@@ -72,6 +72,14 @@ class User < ActiveRecord::Base
     groups.count > 0
   end
 
+
+  # TODO: unit tests
+  # used for sending "system" sms's (from reminders, nudges, etc)
+  def can_message? o
+    return true if admin?
+    false
+  end
+
   ##############################################################################
   # PRIVATE METHODS
   ##############################################################################
