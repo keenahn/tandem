@@ -1,6 +1,6 @@
 require "clockwork"
-require "./config/boot"
-require "./config/environment"
+require "./config/boot.rb"
+require "./config/environment.rb"
 
 module Clockwork
   # handler receives the time when job is prepared to run in the 2nd argument
