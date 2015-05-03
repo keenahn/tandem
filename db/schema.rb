@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150419224034) do
+ActiveRecord::Schema.define(version: 20150503033125) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -103,6 +103,20 @@ ActiveRecord::Schema.define(version: 20150419224034) do
   add_index "pairs", ["member_2_id"], name: "index_pairs_on_member_2_id", using: :btree
   add_index "pairs", ["tandem_number", "member_1_id"], name: "index_pairs_on_tandem_number_and_member_1_id", using: :btree
   add_index "pairs", ["tandem_number", "member_2_id"], name: "index_pairs_on_tandem_number_and_member_2_id", using: :btree
+
+  create_table "reminders", force: :cascade do |t|
+    t.integer  "pair_id"
+    t.integer  "member_id"
+    t.integer  "status",        default: 0
+    t.integer  "integer",       default: 0
+    t.datetime "next_utc_time"
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+  end
+
+  add_index "reminders", ["member_id"], name: "index_reminders_on_member_id", using: :btree
+  add_index "reminders", ["pair_id"], name: "index_reminders_on_pair_id", using: :btree
+  add_index "reminders", ["status", "next_utc_time"], name: "index_reminders_on_status_and_next_utc_time", using: :btree
 
   create_table "sms", force: :cascade do |t|
     t.integer  "from_id"
