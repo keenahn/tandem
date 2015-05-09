@@ -128,10 +128,24 @@ class Member < ActiveRecord::Base
 
   # TODO: unit tests
   def unsubscribed?
-    #TODO
-    false
+    !active?
   end
 
+  # TODO: unit tests
+  def active?
+    active
+  end
+
+  # TODO: unit tests
+  def unsubscribe
+    self.active = false
+  end
+
+  # TODO: unit tests
+  def unsubscribe!
+    unsubscribe
+    save
+  end
 
   # TODO: unit tests
   # Doesn't save

@@ -36,8 +36,10 @@ class TandemStrings
             neutral_possessive: "their",
             neutral_subject: "they",
           },
-
           messages: {
+            phone_number_not_in_system: "Sorry, the phone number you are using is not in our system. Please contact support.",
+            phone_number_unsubscribed: "Your phone number has been unsubscribed. If this was unintentional, please contact support.",
+            pair_not_found: "Sorry, we can't find an active pair with your phone number. Please contact support.",
             am_or_pm: "AM or PM?",
             bad_time: "Sorry, didn't understand that. If you want to reschedule, reply like this example: reschedule 4:36 PM. Thanks!",
             no_response_both_first_time: "Okay guys, looks like neither of you %{activity_past}. But you still can! Reply 'yes' and we'll tell your buddy. Reply with anything else to send a message.\nYou can also reply 'reschedule X:XX am [or pm]' to set a new check-in for today.",

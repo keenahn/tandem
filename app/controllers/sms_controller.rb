@@ -10,21 +10,22 @@ class SmsController < ApplicationController
   def receive
     return false unless (@@debug || valid_request?(params))
 
-    tandem_number = params["To"][-10..10]
+    tandem_number = Phoner::Phone.parse(params["To"]).to_s
     raise t("tandem.errors.no_from_number_provided") unless params["From"] # TODO: fix and internationalize
 
-    member_number = params["From"][-10..10]
+    member_number = Phoner::Phone.parse(params["From"]).to_s
 
     # Find the member based on their phone number
     # TODO: what if the same phone number is used for members who belong in multiple groups?
-    @member = Member.find_by_phone_number(member_number)
+    @member = Member.find_by(phone_number: member_number)
+
     return twiml(t("tandem.messages.phone_number_not_in_system")) unless @member
     return twiml(t("tandem.messages.phone_number_unsubscribed")) if @member.unsubscribed?
 
     # Find the pair, since they are uniquely identified by member_number, tandem_number
-    @pair = Pair.find_by_member_id_and_tandem_number @member.id, tandem_number
-    return twiml(t("tandem.messages.pair_not_found", member_number: member_number, tandem_number: tandem_number)) unless @pair
-
+    @pair = Pair.find_by_member_id_and_tandem_number(@member.id, tandem_number)
+    # return twiml(t("tandem.messages.pair_not_found", member_number: member_number, tandem_number: tandem_number)) unless @pair
+    return twiml(t("tandem.messages.pair_not_found")) unless @pair
     return handle_pass_through @member, @pair, params["Body"]
 
 
@@ -84,11 +85,16 @@ class SmsController < ApplicationController
 
   def handle_pass_through member, pair, body
     other_member = pair.other_member(member)
-    Sms.create(
+
+    p = {
       from: member,
       to: other_member,
       message: body
-    )
+    }
+
+    # puts p
+
+    Sms.create(p)
     render nothing: true, status: 200, content_type: "text/html"
   end
 
