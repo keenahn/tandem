@@ -25,7 +25,7 @@ class PairsController < ApplicationController
   def edit
   end
 
-  # TODO: I18m
+  # TODO: I18n
   def create
     @pair  = Pair.new(pair_params)
     @group = @pair.group
