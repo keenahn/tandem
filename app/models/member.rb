@@ -29,20 +29,20 @@ class Member < ActiveRecord::Base
             2 => :seen_second_reminder,
             3 => :seen_first_other_reminder,
             4 => :seen_second_other_reminder,
-            5 => :seen_first_yes_reply,
-            6 => :seen_second_yes_reply,
-            7 => :seen_first_other_yes_reply,
-            8 => :seen_second_other_yes_reply,
-            9 => :seen_first_reschedule_reply,
-           10 => :seen_second_reschedule_reply,
+            5 => :seen_first_doer_yes,
+            6 => :seen_second_doer_yes,
+            7 => :seen_first_helper_yes,
+            8 => :seen_second_helper_yes,
+            9 => :seen_first_reschedule,
+           10 => :seen_second_reschedule,
            11 => :seen_first_other_reschedule,
            12 => :seen_second_other_reschedule,
-           13 => :seen_first_no_reply,
-           14 => :seen_second_no_reply,
-           15 => :seen_first_other_no_reply,
-           16 => :seen_second_other_no_reply,
-           17 => :seen_first_both_no_reply,
-           18 => :seen_second_both_no_reply,
+           13 => :seen_first_no,
+           14 => :seen_second_no,
+           15 => :seen_first_other_no,
+           16 => :seen_second_other_no,
+           17 => :seen_first_both_no,
+           18 => :seen_second_both_no,
            column: "message_flags"
 
   ##############################################################################
@@ -165,6 +165,41 @@ class Member < ActiveRecord::Base
     save
   end
 
+  # TODO: unit tests
+  # Doesn't save
+  def increment_doer_yes_count
+    return true if seen_second_doer_yes?
+    if seen_first_doer_yes
+      self.seen_second_doer_yes = true
+    else
+      self.seen_first_doer_yes  = true
+    end
+  end
+
+  # TODO: unit tests
+  # Does save
+  def increment_doer_yes_count!
+    increment_doer_yes_count
+    save
+  end
+
+  # TODO: unit tests
+  # Doesn't save
+  def increment_helper_yes_count
+    return true if seen_second_helper_yes?
+    if seen_first_helper_yes
+      self.seen_second_helper_yes = true
+    else
+      self.seen_first_helper_yes  = true
+    end
+  end
+
+  # TODO: unit tests
+  # Does save
+  def increment_helper_yes_count!
+    increment_helper_yes_count
+    save
+  end
 
   ##############################################################################
   # PRIVATE METHODS

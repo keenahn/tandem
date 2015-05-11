@@ -14,7 +14,7 @@ class Sms < ActiveRecord::Base
   belongs_to :from, polymorphic: true
 
   after_validation :clean_params
-  after_create :delay_send_sms
+  # after_create :delay_send_sms
 
   MAX_LENGTH = 160
 
@@ -22,15 +22,14 @@ class Sms < ActiveRecord::Base
     Sms.config.dry_run
   end
 
+  def self.create_and_send p
+    s = create(p)
+    s.delay_send_sms
+  end
+
   def send_sms
     return puts inspect if dry_run?
     TwilioClient.sms to_number, message
-  end
-
-  private
-
-  def can_send?
-    from.can_message? to
   end
 
   def delay_send_sms
@@ -38,6 +37,11 @@ class Sms < ActiveRecord::Base
     SendSmsJob.perform_later self
   end
 
+  private
+
+  def can_send?
+    from.can_message? to
+  end
 
   # TODO: internationalize
   def clean_params

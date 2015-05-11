@@ -8,6 +8,7 @@ class Pair < ActiveRecord::Base
   include Concerns::ActiveRecordExtensions
   include Concerns::ActiveInactiveMixin
   include Concerns::LocalTimeMixin
+  include Concerns::SmsableMixin
 
   ##############################################################################
   # CONSTANTS
@@ -121,6 +122,11 @@ class Pair < ActiveRecord::Base
     member_1
   end
 
+  # TODO:
+  def can_message? m
+    return true if m.id == member_1_id || m.id == member_2_id
+    false
+  end
 
   # TODO: unit tests
   def set_all_reminder_times t
@@ -149,6 +155,11 @@ class Pair < ActiveRecord::Base
 
   def next_reminder_time_utc
     Tandem::Utils.parse_time_in_zone("#{local_date} #{reminder_time_today}", time_zone).utc
+  end
+
+  # Alias for sms
+  def phone_number
+    tandem_number
   end
 
   ##############################################################################

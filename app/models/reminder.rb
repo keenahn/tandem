@@ -76,7 +76,7 @@ class Reminder < ActiveRecord::Base
 
   # TODO: unit tests
   def send_reminder
-    puts "Sending #{self}"
+    # puts "Sending #{self}"
 
     # determine which text message(s) to send
     message_strings = current_message_strings.split("\n")
@@ -105,11 +105,9 @@ class Reminder < ActiveRecord::Base
 
   def send_sms message_strings
     message_strings.each{|x|
-      Sms.create(
-        from:        group.owner,
-        from_number: pair.tandem_number,
+      Sms.create_and_send(
+        from:        pair,
         to:          member,
-        to_number:   member.phone_number,
         message:     x
       )
     }
@@ -123,6 +121,7 @@ class Reminder < ActiveRecord::Base
 
 
   # TODO: unit tests
+  # TODO: move to member_message class
   def current_message_template_name
     message_time = "post_second_time"
     message_base = "reminder_simultaneous_same_activities"
@@ -138,9 +137,6 @@ class Reminder < ActiveRecord::Base
     activity_tenses = I18n.t("tandem.activities.#{pair.activity}")
     Hash[activity_tenses.map{|k,v| ["activity_#{k}".to_sym, v]}]
   end
-
-
-
 
   # TODO: unit tests
   def to_s

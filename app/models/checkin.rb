@@ -23,6 +23,7 @@ class Checkin < ActiveRecord::Base
 
   belongs_to :member
   belongs_to :pair
+  delegate :group, to: :pair
 
   ##############################################################################
   # VALIDATIONS
@@ -73,6 +74,18 @@ class Checkin < ActiveRecord::Base
     mark_undone
     save
   end
+
+  # TODO: unit tests
+  def done?
+    done_at.nil?
+  end
+
+  # TODO: unit tests
+  def other_member
+    pair.other_member member
+  end
+
+
 
   ##############################################################################
   # PRIVATE METHODS
