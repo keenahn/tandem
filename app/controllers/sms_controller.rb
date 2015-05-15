@@ -8,39 +8,29 @@ class SmsController < ApplicationController
   skip_before_action :verify_authenticity_token, only: [:receive]
 
   def receive
-    return false unless (@@debug || valid_request?(params))
-
     tandem_number = Phoner::Phone.parse(params["To"]).to_s
     raise t("tandem.errors.no_from_number_provided") unless params["From"] # TODO: fix and internationalize
 
-    member_number = Phoner::Phone.parse(params["From"]).to_s
-
     # Find the member based on their phone number
     # TODO: what if the same phone number is used for members who belong in multiple groups?
+    member_number = Phoner::Phone.parse(params["From"]).to_s
     member = Member.find_by(phone_number: member_number)
-
     return twiml(t("tandem.messages.phone_number_not_in_system")) unless member
     return twiml(t("tandem.messages.phone_number_unsubscribed")) if member.unsubscribed?
 
-    # Find the pair, since they are uniquely identified by member_number, tandem_number
+    # Find the pair, since they are uniquely identified by member_id, tandem_number
     pair = Pair.find_by_member_id_and_tandem_number(member.id, tandem_number)
-    # return twiml(t("tandem.messages.pair_not_found", member_number: member_number, tandem_number: tandem_number)) unless pair
     return twiml(t("tandem.messages.pair_not_found")) unless pair
 
-    # Get the date in the member's timezone
-    local_date = member.local_date
-
-    # Get the activity for the member from the pair
-    activity   = pair.activity
+    local_date = member.local_date   # Get the date in the member's timezone
+    activity   = pair.activity       # Get the activity for the member from the pair
 
     # Get the checkin
     checkin = Checkin.find_by(member_id: member.id, pair_id: pair.id, local_date: local_date)
 
-    # Parse the actual comment received
-    body = params["Body"].strip
-
     # Save it to the database
-    message = Sms.create( from: member, to: pair, message: body )
+    body = params["Body"].strip
+    message = Sms.create(from: member, to: pair, message: body)
 
     if checkin
       return handle_yes(checkin)              if matches_yes?(body)
@@ -52,12 +42,6 @@ class SmsController < ApplicationController
   end
 
   private
-
-  # TODO: unit tests
-  def valid_request? params
-    # TODO
-    true
-  end
 
   def twiml msg
     render partial: "twilio/message", locals: {msg: msg}
@@ -112,48 +96,49 @@ class SmsController < ApplicationController
     "#{message_base}_#{message_time}"
   end
 
+  def get_reschedule_time reschedule_time_string, pair
+    local_date_string = pair.local_date.strftime(Tandem::Consts::DEFAULT_DATE_FORMAT)
+    reschedule_time_string = "#{local_date_string} #{reschedule_time_string}"
+    Tandem::Utils.parse_time_in_zone(reschedule_time_string, pair.time_zone)
+  end
+
   # TODO: unit tests
   def handle_reschedule checkin, body
     reschedule_time_string = extract_time(body)
-    pair = checkin.pair
     return twiml(t("tandem.messages.bad_time")) unless reschedule_time_string
 
-    local_date_string = pair.local_date.strftime(Tandem::Consts::DEFAULT_DATE_FORMAT)
-    reschedule_time_string = "#{local_date_string} #{reschedule_time_string}"
-    reschedule_time = Tandem::Utils.parse_time_in_zone(reschedule_time_string, pair.time_zone)
-
+    pair = checkin.pair
+    reschedule_time = get_reschedule_time(reschedule_time_string, pair)
     return twiml(t("tandem.messages.bad_time")) unless reschedule_time
 
+    # This is the most complex part of this function, and it's not easily refactored
     hour = reschedule_time.strftime("%H").to_i
-
-    local_time = pair.local_time
-    reminder = checkin.reminder
-
+    body_down = body.downcase.strip
     if hour <= 12
-      meridiem_set = false
-      if body.downcase.include?("a")
-        reschedule_time_string += " AM"
-        meridiem_set = true
-      elsif body.downcase.include?("p")
+      if body_down.include?("p")
         reschedule_time_string += " PM"
-        meridiem_set = true
+      elsif body_down.include?("a")
+        reschedule_time_string += " AM"
       end
-      reschedule_time_string = "#{local_date_string} #{reschedule_time_string}"
-      reschedule_time = Tandem::Utils.parse_time_in_zone(reschedule_time_string, pair.time_zone)
+      meridiem_set = body_down.include?("a") || body_down.include?("p")
+      reschedule_time = get_reschedule_time(reschedule_time_string, pair) if meridiem_set
     else
       meridiem_set = true
     end
+
+    local_time = pair.local_time
 
     if meridiem_set
       return reschedule_and_notify(checkin, reschedule_time) if local_time < reschedule_time
       return twiml(t("tandem.messages.reschedule_too_late"))
     end
 
-    # At this point, we have an ambiguous time
-
+    # If meridiem is not set, could be one of two times
+    # Without the meridiem suffix, it will be interpreted as AM
     if local_time > reschedule_time
+      # When interpreted as AM, the time is past, so try it with forced PM
       reschedule_time_string += " PM"
-      reschedule_time = Tandem::Utils.parse_time_in_zone(reschedule_time_string, pair.time_zone)
+      reschedule_time = get_reschedule_time(reschedule_time_string, pair)
 
       # Rescheduling when forcing PM is also after current time, so they gave an impossible time
       return twiml(t("tandem.messages.reschedule_too_late")) if local_time > reschedule_time
@@ -162,8 +147,8 @@ class SmsController < ApplicationController
       # This will reschedule for 1:30 PM
       return reschedule_and_notify(checkin, reschedule_time)
     else
-      # If hour is less than 12, and meridiem is not set, could be one of two times
-      # without the meridiem suffix, it will be interpreted as AM
+      # reschedule time is ambiguous so ask for clarification
+      reminder = checkin.reminder
       reminder.temp_reschedule(reschedule_time)
       return twiml(t("tandem.messages.am_or_pm"))
     end

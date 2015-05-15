@@ -171,7 +171,4 @@ describe SmsController do
     end
   end # close reschedule
 
-
-
-
 end
