@@ -1,96 +1,69 @@
 require "spec_helper"
 
+def expect_twiml template
+  allow(controller).to receive(:render).with no_args
+  expect(controller).to receive(:render).with({
+    :partial => "twilio/message",
+    :locals  => {msg: I18n.t("tandem.messages.#{template}")}
+  })
+end
+
+def expect_and_call_original sym
+  allow(controller).to receive(sym).with no_args
+  expect(controller).to receive(sym).and_call_original
+end
+
 describe SmsController do
+  describe "no number" do
+    it "should raise error when no From number" do
+      @params = {
+        "To" => TwilioClient::DEFAULT_FROM_NUMBER,
+        "Body" => "STUFF",
+        "extra" => "Doesn't matter"
+      }
+      expect{ post(:receive, @params) }.to raise_error
+    end
+  end
+
   describe "no checkin" do
     let(:p)        { FactoryGirl.create(:pair)   }
     let(:member_1) { p.member_1                  }
     let(:phone_1 ) { member_1.phone_number       }
 
-    it "should raise error when no From number" do
-      params = {
+    before :each do
+      @params = {
         "To" => TwilioClient::DEFAULT_FROM_NUMBER,
-        "Body" => "TESTING NO FROM",
+        "Body" => "STUFF",
         "extra" => "Doesn't matter"
       }
-
-      expect{ post(:receive, params) }.to raise_error
+      expect(response.status).to eq(200)
     end
 
     it "should return twiml phone_number_not_in_system when member not found" do
-      params = {
-        "From" => "9041038398210983",
-        "To" => TwilioClient::DEFAULT_FROM_NUMBER,
-        "Body" => "TESTING Bad number",
-        "extra" => "Doesn't matter"
-      }
-
-      allow(controller).to receive(:render).with no_args
-      expect(controller).to receive(:render).with({
-        :partial => "twilio/message",
-        :locals  => {msg: I18n.t("tandem.messages.phone_number_not_in_system")}
-      })
-
-      post :receive, params
-
-      expect(response.status).to eq(200)
+      @params["From"] = "9041038398210983"
+      expect_twiml("phone_number_not_in_system")
+      post :receive, @params
     end
 
     it "should return twiml phone_number_unsubscribed when member unsubscribed" do
       member_1.unsubscribe!
-
-      params = {
-        "From" => phone_1,
-        "To" => TwilioClient::DEFAULT_FROM_NUMBER,
-        "Body" => "TESTING PASS THROUGH",
-        "extra" => "Doesn't matter"
-      }
-
-      allow(controller).to receive(:render).with no_args
-      expect(controller).to receive(:render).with({
-        :partial => "twilio/message",
-        :locals  => {msg: I18n.t("tandem.messages.phone_number_unsubscribed")}
-      })
-
-      post :receive, params
-
-      expect(response.status).to eq(200)
+      @params["From"] =  phone_1
+      expect_twiml("phone_number_unsubscribed")
+      post :receive, @params
     end
 
     it "should return twiml pair_not_found when pair not found" do
       member_3 = FactoryGirl.create(:member)
-      params = {
-        "From" => member_3.phone_number,
-        "To" => TwilioClient::DEFAULT_FROM_NUMBER,
-        "Body" => "TESTING PASS THROUGH",
-        "extra" => "Doesn't matter"
-      }
-
-      allow(controller).to receive(:render).with no_args
-      expect(controller).to receive(:render).with({
-        :partial => "twilio/message",
-        :locals  => {msg: I18n.t("tandem.messages.pair_not_found")}
-      })
-
-      post :receive, params
-
-      expect(response.status).to eq(200)
+      @params["From"] = member_3.phone_number
+      expect_twiml("pair_not_found")
+      post :receive, @params
     end
 
     it "should pass through" do
-      params = {
-        "From"  => phone_1,
-        "To"    => TwilioClient::DEFAULT_FROM_NUMBER,
-        "Body"  => "TESTING PASS THROUGH",
-        "extra" => "Doesn't matter"
-      }
-
-      # expect(Sms).to receive(:create)
-
-      post :receive, params
-
-      expect(response.status).to eq(200)
+      @params["From"] = phone_1
+      post :receive, @params
     end
-  end
+  end # close no checkin
 
   describe "with checkin" do
     let(:pair)     { FactoryGirl.create(:pair)   }
@@ -103,17 +76,12 @@ describe SmsController do
         "Body"  => "Yes, doing it now!",
         "extra" => "Doesn't matter"
       }
-
       checkin = FactoryGirl.create(:checkin, pair: pair, member: member)
-
-      allow(controller).to receive(:handle_yes).with no_args
-      expect(controller).to receive(:handle_yes).and_call_original
-
-      post(:receive, params)
-
+      expect_and_call_original :handle_yes
       expect(response.status).to eq(200)
+      post(:receive, params)
     end
-  end
+  end # close with checkin
 
   describe "should reschedule" do
     before :each do
@@ -133,7 +101,8 @@ describe SmsController do
         "Body"  => "resched",
         "extra" => "Doesn't matter"
       }
-
+      expect_and_call_original :handle_reschedule
+      expect(response.status).to eq(200)
     end
 
     describe "valid" do
@@ -142,16 +111,8 @@ describe SmsController do
           # Time travel to 12:30 AM
           Timecop.travel(@local_midnight + 30.minute) do
             @params["Body"] = "resched #{t}"
-
-            allow(controller).to receive(:handle_reschedule).with no_args
-            expect(controller).to receive(:handle_reschedule).and_call_original
-
-            allow(controller).to receive(:reschedule_and_notify).with no_args
-            expect(controller).to receive(:reschedule_and_notify).and_call_original
-
+            expect_and_call_original :reschedule_and_notify
             post(:receive, @params)
-
-            expect(response.status).to eq(200)
           end
         end
       end
@@ -163,16 +124,8 @@ describe SmsController do
           # Time travel to 12:30 AM
           Timecop.travel(@local_1330) do
             @params["Body"] = "resched #{t}"
-
-            allow(controller).to receive(:handle_reschedule).with no_args
-            expect(controller).to receive(:handle_reschedule).and_call_original
-
-            allow(controller).to receive(:reschedule_and_notify).with no_args
-            expect(controller).to receive(:reschedule_and_notify).and_call_original
-
+            expect_and_call_original :reschedule_and_notify
             post(:receive, @params)
-
-            expect(response.status).to eq(200)
           end
         end
       end
@@ -184,19 +137,8 @@ describe SmsController do
           # Time travel to 12:30 AM
           Timecop.travel(@local_midnight + 30.minute) do
             @params["Body"] = "resched #{t}"
-
-            allow(controller).to receive(:handle_reschedule).with no_args
-            expect(controller).to receive(:handle_reschedule).and_call_original
-
-            allow(controller).to receive(:render).with no_args
-            expect(controller).to receive(:render).with({
-              :partial => "twilio/message",
-              :locals  => {msg: I18n.t("tandem.messages.bad_time")}
-            })
-
+            expect_twiml("bad_time")
             post(:receive, @params)
-
-            expect(response.status).to eq(200)
           end
         end
       end
@@ -208,19 +150,8 @@ describe SmsController do
           # Time travel to 12:30 AM
           Timecop.travel(@local_midnight + 30.minute) do
             @params["Body"] = "resched #{t}"
-
-            allow(controller).to receive(:handle_reschedule).with no_args
-            expect(controller).to receive(:handle_reschedule).and_call_original
-
-            allow(controller).to receive(:render).with no_args
-            expect(controller).to receive(:render).with({
-              :partial => "twilio/message",
-              :locals  => {msg: I18n.t("tandem.messages.am_or_pm")}
-            })
-
+            expect_twiml("am_or_pm")
             post(:receive, @params)
-
-            expect(response.status).to eq(200)
           end
         end
       end
@@ -232,25 +163,15 @@ describe SmsController do
           # Time travel to 12:30 AM
           Timecop.travel(@local_1330) do
             @params["Body"] = "resched #{t}"
-
-            allow(controller).to receive(:handle_reschedule).with no_args
-            expect(controller).to receive(:handle_reschedule).and_call_original
-
-            allow(controller).to receive(:render).with no_args
-            expect(controller).to receive(:render).with({
-              :partial => "twilio/message",
-              :locals  => {msg: I18n.t("tandem.messages.reschedule_too_late")}
-            })
-
+            expect_twiml("reschedule_too_late")
             post(:receive, @params)
-
-            expect(response.status).to eq(200)
           end
         end
       end
     end
+  end # close reschedule
 
-  end
+
 
 
 end
