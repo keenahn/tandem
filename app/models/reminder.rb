@@ -43,6 +43,7 @@ class Reminder < ActiveRecord::Base
   belongs_to :pair
   has_one    :group, through: :pair
 
+
   ##############################################################################
   # VALIDATIONS
   ##############################################################################
@@ -154,6 +155,19 @@ class Reminder < ActiveRecord::Base
   # TODO: unit tests
   def mark_sent!
     mark_sent
+    save
+  end
+
+  # TODO: unit tests
+  def reschedule utc_time
+    self.next_reminder_time_utc = utc_time
+    self.status = :unsent
+    save
+  end
+
+  def temp_reschedule utc_time
+    self.temp_reschedule_time_utc = utc_time
+    self.status = :unsent
     save
   end
 

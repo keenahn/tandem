@@ -34,7 +34,7 @@ class SmsController < ApplicationController
     activity   = pair.activity
 
     # Get the checkin
-    checkin = member.checkins.find_by(pair_id: pair.id, local_date: local_date)
+    checkin = Checkin.find_by(member_id: member.id, pair_id: pair.id, local_date: local_date)
 
     # Parse the actual comment received
     body = params["Body"].strip
@@ -43,9 +43,9 @@ class SmsController < ApplicationController
     message = Sms.create( from: member, to: pair, message: body )
 
     if checkin
-      return handle_yes(checkin) if matches_yes?(body)
-      return handle_reschedule   if matches_reschedule?(body)
-      return handle_am_pm        if matches_am_pm?(body)
+      return handle_yes(checkin)              if matches_yes?(body)
+      return handle_reschedule(checkin, body) if matches_reschedule?(body)
+      return handle_am_pm                     if matches_am_pm?(body)
     end
     return handle_unsubscribe if matches_unsubscribe?(body)
     handle_pass_through member, pair, body
@@ -113,8 +113,104 @@ class SmsController < ApplicationController
   end
 
   # TODO: unit tests
-  def handle_reschedule
+  def handle_reschedule checkin, body
+    reschedule_time_string = extract_time(body)
+    pair = checkin.pair
+    return twiml(t("tandem.messages.bad_time")) unless reschedule_time_string
+
+    local_date_string = pair.local_date.strftime(Tandem::Consts::DEFAULT_DATE_FORMAT)
+    reschedule_time_string = "#{local_date_string} #{reschedule_time_string}"
+    reschedule_time = Tandem::Utils.parse_time_in_zone(reschedule_time_string, pair.time_zone)
+
+    return twiml(t("tandem.messages.bad_time")) unless reschedule_time
+
+    hour = reschedule_time.strftime("%H").to_i
+
+    local_time = pair.local_time
+    reminder = checkin.reminder
+
+    if hour <= 12
+      meridiem_set = false
+      if body.downcase.include?("a")
+        reschedule_time_string += " AM"
+        meridiem_set = true
+      elsif body.downcase.include?("p")
+        reschedule_time_string += " PM"
+        meridiem_set = true
+      end
+      reschedule_time_string = "#{local_date_string} #{reschedule_time_string}"
+      reschedule_time = Tandem::Utils.parse_time_in_zone(reschedule_time_string, pair.time_zone)
+    else
+      meridiem_set = true
+    end
+
+    if meridiem_set
+      return reschedule_and_notify(checkin, reschedule_time) if local_time < reschedule_time
+      return twiml(t("tandem.messages.reschedule_too_late"))
+    end
+
+    # At this point, we have an ambiguous time
+
+    if local_time > reschedule_time
+      reschedule_time_string += " PM"
+      reschedule_time = Tandem::Utils.parse_time_in_zone(reschedule_time_string, pair.time_zone)
+
+      # Rescheduling when forcing PM is also after current time, so they gave an impossible time
+      return twiml(t("tandem.messages.reschedule_too_late")) if local_time > reschedule_time
+
+      # e.g. The user wants to reschedule for 1:30. It is currently 9:30AM.
+      # This will reschedule for 1:30 PM
+      return reschedule_and_notify(checkin, reschedule_time)
+    else
+      # If hour is less than 12, and meridiem is not set, could be one of two times
+      # without the meridiem suffix, it will be interpreted as AM
+      reminder.temp_reschedule(reschedule_time)
+      return twiml(t("tandem.messages.am_or_pm"))
+    end
+
+  end # close handle_reschedule
+
+
+  # TODO: unit tests
+  # TODO
+  def reschedule_and_notify checkin, reschedule_time
+    reminder = checkin.reminder
+    reminder.reschedule(reschedule_time)
+    send_reschedule_response_doer(checkin)
+    send_reschedule_response_helper(checkin)
+    render_nothing
   end
+
+  # TODO: unit tests
+  def send_reschedule_response_doer checkin
+    member = checkin.member
+    # TODO: move this logic of which message to member_message class
+    doer_message = t("tandem.messages.reschedule_doer").sample
+    Sms.create_and_send(from: checkin.pair, to: member, message: doer_message)
+    member.increment_doer_reschedule_count!
+  end
+
+  # TODO: unit tests
+  def send_reschedule_response_helper checkin
+    partner = checkin.other_member
+    # TODO: move this logic of which message to member_message class
+    helper_message = t("tandem.messages.#{current_reschedule_response_template_name(partner)}")
+    Sms.create_and_send(from: checkin.pair, to: partner, message: helper_message)
+    partner.increment_helper_reschedule_count!
+  end
+
+  # TODO: unit tests
+  # TODO: move to member_message class
+  def current_reschedule_response_template_name partner
+    message_time = "post_second_time"
+    message_base = "reschedule_helper"
+    if !partner.seen_second_helper_yes?
+      message_time = "first_time"
+      message_time = "second_time" if partner.seen_first_helper_reschedule?
+    end
+    "#{message_base}_#{message_time}"
+  end
+
 
   # TODO: unit tests
   def handle_am_pm
@@ -127,6 +223,17 @@ class SmsController < ApplicationController
     # Deactivate the pair
     # Alert the partner
   end
+
+  def extract_time s
+    time_pattern = /\b([0-9]|0[0-9]|1?[0-9]|2[0-3]):[0-5][0-9]/i # matches time 10:23 and similar
+    return time_pattern.match(s)[0] if time_pattern.match(s)
+    nil
+  end
+
+  def extract_am_pm s
+
+  end
+
 
   # TODO: unit tests
   def matches_yes? s

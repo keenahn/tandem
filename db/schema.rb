@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150503200501) do
+ActiveRecord::Schema.define(version: 20150514224003) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -108,15 +108,17 @@ ActiveRecord::Schema.define(version: 20150503200501) do
   create_table "reminders", force: :cascade do |t|
     t.integer  "pair_id"
     t.integer  "member_id"
-    t.integer  "status",                 default: 0
+    t.integer  "status",                   default: 0
     t.datetime "next_reminder_time_utc"
-    t.datetime "created_at",                         null: false
-    t.datetime "updated_at",                         null: false
+    t.datetime "created_at",                           null: false
+    t.datetime "updated_at",                           null: false
+    t.datetime "temp_reschedule_time_utc"
   end
 
   add_index "reminders", ["member_id"], name: "index_reminders_on_member_id", using: :btree
   add_index "reminders", ["pair_id"], name: "index_reminders_on_pair_id", using: :btree
   add_index "reminders", ["status", "next_reminder_time_utc"], name: "index_reminders_on_status_and_next_reminder_time_utc", using: :btree
+  add_index "reminders", ["temp_reschedule_time_utc"], name: "index_reminders_on_temp_reschedule_time_utc", using: :btree
 
   create_table "sms", force: :cascade do |t|
     t.integer  "from_id"

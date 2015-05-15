@@ -33,10 +33,10 @@ class Member < ActiveRecord::Base
             6 => :seen_second_doer_yes,
             7 => :seen_first_helper_yes,
             8 => :seen_second_helper_yes,
-            9 => :seen_first_reschedule,
-           10 => :seen_second_reschedule,
-           11 => :seen_first_other_reschedule,
-           12 => :seen_second_other_reschedule,
+            9 => :seen_first_doer_reschedule,
+           10 => :seen_second_doer_reschedule,
+           11 => :seen_first_helper_reschedule,
+           12 => :seen_second_helper_reschedule,
            13 => :seen_first_no,
            14 => :seen_second_no,
            15 => :seen_first_other_no,
@@ -147,6 +147,8 @@ class Member < ActiveRecord::Base
     save
   end
 
+  # TODO: DRY all the message count stuff
+
   # TODO: unit tests
   # Doesn't save
   def increment_reminder_count
@@ -200,6 +202,45 @@ class Member < ActiveRecord::Base
     increment_helper_yes_count
     save
   end
+
+  # TODO: unit tests
+  # Doesn't save
+  def increment_doer_reschedule_count
+    return true if seen_second_doer_reschedule?
+    if seen_first_doer_reschedule
+      self.seen_second_doer_reschedule = true
+    else
+      self.seen_first_doer_reschedule  = true
+    end
+  end
+
+  # TODO: unit tests
+  # Does save
+  def increment_doer_reschedule_count!
+    increment_doer_reschedule_count
+    save
+  end
+
+  # TODO: unit tests
+  # Doesn't save
+  def increment_helper_reschedule_count
+    return true if seen_second_helper_reschedule?
+    if seen_first_helper_reschedule
+      self.seen_second_helper_reschedule = true
+    else
+      self.seen_first_helper_reschedule  = true
+    end
+  end
+
+  # TODO: unit tests
+  # Does save
+  def increment_helper_reschedule_count!
+    increment_helper_reschedule_count
+    save
+  end
+
+
+
 
   ##############################################################################
   # PRIVATE METHODS

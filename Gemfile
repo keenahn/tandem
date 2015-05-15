@@ -70,6 +70,7 @@ group :development, :test do
   gem "database_cleaner"          # clean database after tests
   gem "dotenv-rails"              # for the .env file
   gem "httparty"                  # HTTP get and post testing
+  gem "timecop"                   # Time travel for testing
 end
 
 group :doc do

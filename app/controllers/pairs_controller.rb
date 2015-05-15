@@ -26,6 +26,7 @@ class PairsController < ApplicationController
   end
 
   # TODO: I18n
+  # TODO: clean reminder time
   def create
     @pair  = Pair.new(pair_params)
     @group = @pair.group

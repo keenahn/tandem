@@ -85,6 +85,20 @@ class Checkin < ActiveRecord::Base
     pair.other_member member
   end
 
+  # TODO: unit tests
+  def reminder
+    Reminder.find_by(pair_id: pair_id, member_id: member_id)
+  end
+
+  # TODO: unit tests
+  def create_or_update_reminder
+    r = Reminder.find_or_initialize_by(pair_id: pair_id, member_id: member_id)
+    r.update_attributes(
+      next_reminder_time_utc: pair.next_reminder_time_utc,
+      status: :unsent,
+    )
+    r.save ? r : nil
+  end
 
 
   ##############################################################################
