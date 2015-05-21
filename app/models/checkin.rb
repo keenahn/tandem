@@ -77,7 +77,7 @@ class Checkin < ActiveRecord::Base
 
   # TODO: unit tests
   def done?
-    done_at.nil?
+    !done_at.nil?
   end
 
   # TODO: unit tests

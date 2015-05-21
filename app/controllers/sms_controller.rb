@@ -71,29 +71,18 @@ class SmsController < ApplicationController
   def send_yes_response_doer checkin
     # TODO: move this logic of which message to member_message class
     doer_message = t("tandem.messages.yes_response_doer").sample
-    Sms.create_and_send(from: checkin.pair, to: checkin.member, message: doer_message)
+    member = checkin.member
+    Sms.create_and_send(from: checkin.pair, to: member, message: doer_message)
     member.increment_doer_yes_count!
   end
 
   # TODO: unit tests
   def send_yes_response_helper checkin
     partner = checkin.other_member
-    # TODO: move this logic of which message to member_message class
-    helper_message = t("tandem.messages.#{current_helper_yes_template_name(partner)}")
+    member_message = Member::Message.new(partner)
+    helper_message = t("tandem.messages.#{member_message.current_helper_yes_template_name}")
     Sms.create_and_send(from: checkin.pair, to: partner, message: helper_message)
     partner.increment_helper_yes_count!
-  end
-
-  # TODO: unit tests
-  # TODO: move to member_message class
-  def current_helper_yes_template_name partner
-    message_time = "post_second_time"
-    message_base = "yes_response_helper"
-    if !partner.seen_second_helper_yes?
-      message_time = "first_time"
-      message_time = "second_time" if partner.seen_first_helper_yes?
-    end
-    "#{message_base}_#{message_time}"
   end
 
   def get_reschedule_time reschedule_time_string, pair
@@ -178,24 +167,11 @@ class SmsController < ApplicationController
   # TODO: unit tests
   def send_reschedule_response_helper checkin
     partner = checkin.other_member
-    # TODO: move this logic of which message to member_message class
-    helper_message = t("tandem.messages.#{current_reschedule_response_template_name(partner)}")
+    member_message = Member::Message.new(partner)
+    helper_message = t("tandem.messages.#{member_message.current_reschedule_response_template_name}")
     Sms.create_and_send(from: checkin.pair, to: partner, message: helper_message)
     partner.increment_helper_reschedule_count!
   end
-
-  # TODO: unit tests
-  # TODO: move to member_message class
-  def current_reschedule_response_template_name partner
-    message_time = "post_second_time"
-    message_base = "reschedule_helper"
-    if !partner.seen_second_helper_yes?
-      message_time = "first_time"
-      message_time = "second_time" if partner.seen_first_helper_reschedule?
-    end
-    "#{message_base}_#{message_time}"
-  end
-
 
   # TODO: unit tests
   def handle_am_pm
