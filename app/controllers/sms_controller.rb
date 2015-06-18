@@ -15,12 +15,12 @@ class SmsController < ApplicationController
     # TODO: what if the same phone number is used for members who belong in multiple groups?
     member_number = Phoner::Phone.parse(params["From"]).to_s
     member = Member.find_by(phone_number: member_number)
-    return twiml(t("tandem.messages.phone_number_not_in_system")) unless member
-    return twiml(t("tandem.messages.phone_number_unsubscribed")) if member.unsubscribed?
+    return twiml(Tandem::Message.message_string("phone_number_not_in_system")) unless member
+    return twiml(Tandem::Message.message_string("phone_number_unsubscribed")) if member.unsubscribed?
 
     # Find the pair, since they are uniquely identified by member_id, tandem_number
     pair = Pair.find_by_member_id_and_tandem_number(member.id, tandem_number)
-    return twiml(t("tandem.messages.pair_not_found")) unless pair
+    return twiml(Tandem::Message.message_string("pair_not_found")) unless pair
 
     local_date = member.local_date   # Get the date in the member's timezone
     activity   = pair.activity       # Get the activity for the member from the pair
@@ -60,7 +60,7 @@ class SmsController < ApplicationController
 
   # TODO: unit tests
   def handle_yes checkin
-    return twiml(t("tandem.messages.yes_again_response_doer")) if checkin.done?
+    return twiml(Tandem::Message.message_string("yes_again_response_doer")) if checkin.done?
     checkin.mark_done!                # Mark checkin as checked in
     send_yes_response_doer(checkin)   # Alert doer
     send_yes_response_helper(checkin) # Alert helper
@@ -70,7 +70,7 @@ class SmsController < ApplicationController
   # TODO: unit tests
   def send_yes_response_doer checkin
     # TODO: move this logic of which message to member_message class
-    doer_message = t("tandem.messages.yes_response_doer").sample
+    doer_message = Tandem::Message.message_string("yes_response_doer")
     member = checkin.member
     Sms.create_and_send(from: checkin.pair, to: member, message: doer_message)
     member.increment_doer_yes_count!
@@ -80,8 +80,8 @@ class SmsController < ApplicationController
   def send_yes_response_helper checkin
     partner = checkin.other_member
     member_message = Member::Message.new(partner)
-    helper_message = t("tandem.messages.#{member_message.current_helper_yes_template_name}")
-    Sms.create_and_send(from: checkin.pair, to: partner, message: helper_message)
+    helper_messages = member_message.current_helper_yes_messages
+    Sms.create_and_send(from: checkin.pair, to: partner, message: helper_messages)
     partner.increment_helper_yes_count!
   end
 
@@ -94,11 +94,11 @@ class SmsController < ApplicationController
   # TODO: unit tests
   def handle_reschedule checkin, body
     reschedule_time_string = extract_time(body)
-    return twiml(t("tandem.messages.bad_time")) unless reschedule_time_string
+    return twiml(Tandem::Message.message_string("bad_time")) unless reschedule_time_string
 
     pair = checkin.pair
     reschedule_time = get_reschedule_time(reschedule_time_string, pair)
-    return twiml(t("tandem.messages.bad_time")) unless reschedule_time
+    return twiml(Tandem::Message.message_string("bad_time")) unless reschedule_time
 
     # This is the most complex part of this function, and it's not easily refactored
     hour = reschedule_time.strftime("%H").to_i
@@ -119,7 +119,7 @@ class SmsController < ApplicationController
 
     if meridiem_set
       return reschedule_and_notify(checkin, reschedule_time) if local_time < reschedule_time
-      return twiml(t("tandem.messages.reschedule_too_late"))
+      return twiml(Tandem::Message.message_string("reschedule_too_late"))
     end
 
     # If meridiem is not set, could be one of two times
@@ -130,7 +130,7 @@ class SmsController < ApplicationController
       reschedule_time = get_reschedule_time(reschedule_time_string, pair)
 
       # Rescheduling when forcing PM is also after current time, so they gave an impossible time
-      return twiml(t("tandem.messages.reschedule_too_late")) if local_time > reschedule_time
+      return twiml(Tandem::Message.message_string("reschedule_too_late")) if local_time > reschedule_time
 
       # e.g. The user wants to reschedule for 1:30. It is currently 9:30AM.
       # This will reschedule for 1:30 PM
@@ -139,7 +139,7 @@ class SmsController < ApplicationController
       # reschedule time is ambiguous so ask for clarification
       reminder = checkin.reminder
       reminder.temp_reschedule(reschedule_time)
-      return twiml(t("tandem.messages.am_or_pm"))
+      return twiml(Tandem::Message.message_string("am_or_pm"))
     end
 
   end # close handle_reschedule
@@ -159,7 +159,7 @@ class SmsController < ApplicationController
   def send_reschedule_response_doer checkin
     member = checkin.member
     # TODO: move this logic of which message to member_message class
-    doer_message = t("tandem.messages.reschedule_doer").sample
+    doer_message = Tandem::Message.message_string("reschedule_doer")
     Sms.create_and_send(from: checkin.pair, to: member, message: doer_message)
     member.increment_doer_reschedule_count!
   end
@@ -168,7 +168,7 @@ class SmsController < ApplicationController
   def send_reschedule_response_helper checkin
     partner = checkin.other_member
     member_message = Member::Message.new(partner)
-    helper_message = t("tandem.messages.#{member_message.current_reschedule_response_template_name}")
+    helper_message = member_message.current_reschedule_response_messages
     Sms.create_and_send(from: checkin.pair, to: partner, message: helper_message)
     partner.increment_helper_reschedule_count!
   end

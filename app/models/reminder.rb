@@ -65,6 +65,12 @@ class Reminder < ActiveRecord::Base
   # SCOPES
   ##############################################################################
 
+  # TODO: unit tests
+  scope :unsent,      -> { where(status: UNSENT)      }
+  scope :sent,        -> { where(status: SENT)        }
+  scope :rescheduled, -> { where(status: RESCHEDULED) }
+  scope :deleted,     -> { where(status: DELETED)     }
+
   ##############################################################################
   # CLASS METHODS
   ##############################################################################
@@ -127,7 +133,8 @@ class Reminder < ActiveRecord::Base
   # TODO: unit tests
   def send_reminder
     # determine which text message(s) to send
-    message_strings = current_message_strings.split("\n")
+    member_message = Member::Message.new(member)
+    message_strings = member_message.current_reminder_messages(activity_args)
 
     # Send the messages using SMS
     send_sms(message_strings)
@@ -141,8 +148,11 @@ class Reminder < ActiveRecord::Base
   # TODO
   def send_doer_helper_no_reply_messages doer, helper
     # determine which text message(s) to send
-    doer_message_strings   = doer.current_doer_no_reply_message_strings.split("\n")
-    helper_message_strings = helper.current_helper_no_reply_message_strings.split("\n")
+    doer_message   = Member::Message.new(doer)
+    helper_message = Member::Message.new(helper)
+
+    doer_message_strings   = doer_message.current_doer_no_reply_messages
+    helper_message_strings = helper_message.current_helper_no_reply_messages
 
     # Send the messages using SMS
     send_sms(doer_message_strings, doer)
@@ -152,71 +162,16 @@ class Reminder < ActiveRecord::Base
     # mark_sent!
   end
 
+
+  # TODO: unit tests
   def send_sms message_strings, m = nil
-    message_strings.each{|x|
-      Sms.create_and_send(
-        from:        pair,
-        to:          m ? m : member,
-        message:     x
-      )
-    }
+    Sms.create_and_send(
+      from:    pair,
+      to:      m ? m : member,
+      message: message_strings
+    )
   end
 
-  # TODO: unit tests
-  def current_message_strings
-    message_template_name = current_message_template_name
-    I18n.t("tandem.messages.#{message_template_name}", activity_args)
-  end
-
-
-  # TODO: unit tests
-  # TODO: move to member_message class
-  def current_message_template_name
-    message_time = "post_second_time"
-    message_base = "reminder_simultaneous_same_activities"
-    if !member.seen_second_reminder?
-      message_time = "first_time"
-      message_time = "second_time" if member.seen_first_reminder?
-    end
-    "#{message_base}_#{message_time}"
-  end
-
-  # TODO: unit tests
-  # TODO: move to member_message class
-  def current_no_reply_message_strings
-
-  end
-
-  # TODO: unit tests
-  # TODO: move to member_message class
-  def current_no_reply_message_template_name
-    message_time = "post_second_time"
-
-
-    # TODO:
-    # no_reply_both_first_time:
-    # no_reply_both_post_second_time:
-    # no_reply_both_second_time:
-    # no_reply_doer:
-    # no_reply_doer_first_time:
-    # no_reply_doer_post_second_time:
-    # no_reply_doer_second_time:
-    # no_reply_helper:
-    # no_reply_helper_first_time:
-    # no_reply_helper_second_time:
-    # no_reply_helper_post_second_time:
-    # no_reply_simultaneous_different_activities:
-    # no_reply_simultaneous_same_activities:
-
-
-    if !member.seen_second_reminder?
-      message_time = "first_time"
-      message_time = "second_time" if member.seen_first_reminder?
-    end
-    "#{message_base}_#{message_time}"
-  end
-
-  # TODO: unit tests
   def activity_args
     activity_tenses = I18n.t("tandem.activities.#{pair.activity}")
     Hash[activity_tenses.map{|k,v| ["activity_#{k}".to_sym, v]}]
@@ -228,44 +183,37 @@ class Reminder < ActiveRecord::Base
      Next Reminder Time: #{next_reminder_time_utc} ".squish
   end
 
-
-  # TODO: unit tests
-  def mark_sent
-    self.status = :sent
-    self.last_reminder_time_utc = Time.now.utc
-  end
-
-  # TODO: unit tests
-  def mark_sent!
-    mark_sent
-    save
-  end
-
   # TODO: unit tests
   def no_reply_sent?
     !last_no_reply_sent_time_utc.nil?
   end
 
-  # TODO: unit tests
+  def mark_sent
+    self.status = :sent
+    self.last_reminder_time_utc = Time.now.utc
+  end
+
+  def mark_sent!
+    mark_sent
+    save
+  end
+
   def reschedule utc_time
     self.next_reminder_time_utc = utc_time
     self.status = :unsent
     save
   end
 
-  # TODO: unit tests
   def temp_reschedule utc_time
     self.temp_reschedule_time_utc = utc_time
     self.status = :unsent
     save
   end
 
-  # TODO: unit tests
   def checkin
     Checkin.find_by(pair_id: pair_id, member_id: member_id, local_date: member.local_date)
   end
 
-  # TODO: unit tests
   def checkin_done?
     checkin && checkin.done?
   end
@@ -277,5 +225,3 @@ class Reminder < ActiveRecord::Base
   private
 
 end
-
-

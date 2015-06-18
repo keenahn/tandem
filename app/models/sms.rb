@@ -23,8 +23,12 @@ class Sms < ActiveRecord::Base
   end
 
   def self.create_and_send p
-    s = create(p)
-    s.delay_send_sms
+    messages = Array(p.delete(:message)) # will Array'ize single elements
+    messages.each{|m|
+      s = create p.merge({message: m})
+      s.delay_send_sms
+    }
+
   end
 
   def send_sms
