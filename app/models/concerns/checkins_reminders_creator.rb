@@ -1,7 +1,6 @@
 module Concerns
   class CheckinsRemindersCreator
 
-
     # Runs once an hour thanks to Clockwork and DelayedJob
     def self.create_all_for_hour
       puts "Creating checkins for the day"

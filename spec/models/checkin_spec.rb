@@ -1,12 +1,12 @@
-require 'rails_helper'
+require "spec_helper"
 
 RSpec.describe Checkin, type: :model do
 
   it { should belong_to(:member) }
-  it { should have_many(:pair) }
+  it { should belong_to(:pair) }
 
   [:member, :pair, :local_date].each do |f|
-    it { should validate_presence_of(:f) }
+    it { should validate_presence_of(f) }
   end
 
   it { should validate_uniqueness_of(:local_date).scoped_to([:member_id, :pair_id]) }

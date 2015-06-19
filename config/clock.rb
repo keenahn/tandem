@@ -14,9 +14,7 @@ module Clockwork
     CreateCheckinsAndRemindersJob.perform_later
   }
 
-
   mutliples_of_five = (0..11).to_a.map{|x| "**:#{(x*5).to_s.rjust(2, '0')}"}
-
 
   every(1.hour, "Send 'No Reply' messages", at: []){
     SendNoReplyMessagesJob.perform_later

@@ -83,19 +83,19 @@ class Reminder < ActiveRecord::Base
     }
   end
 
+  def self.pair_ids_for_no_reply_messages window = NO_REPLY_WINDOW, no_reply_minutes = NO_REPLY_MINUTES
+    oldest_reminder_sent_time = Time.now - no_reply_minutes.minutes
+    time_range = (oldest_reminder_sent_time - window.minutes)..oldest_reminder_sent_time
+    return Reminder.sent.where(last_reminder_time_utc: time_range).pluck(:pair_id).uniq
+  end
+
   # TODO: unit tests
   def self.send_no_reply_messages window = NO_REPLY_WINDOW, no_reply_minutes = NO_REPLY_MINUTES
-
-    oldest_reminder_sent_time = Time.now - no_reply_minutes.minutes
-
-    time_range = (oldest_reminder_sent_time - window.minutes)..oldest_reminder_sent_time
-
+    pair_ids = pair_ids_for_no_reply_messages(window, no_reply_minutes)
+    # Naiive way: loop through all pairs linked to sent reminders
     # send no reply messages IF
     #   1. If the checkin is still not marked as done AND
     #   2. it is no_reply_minutes minutes AFTER the last sent reminder
-
-    # Naiive way: loop through all pairs linked to sent reminders
-    pair_ids = Reminder.sent.where(last_reminder_time_utc: time_range).pluck(:pair_id).uniq
 
     Pair.where(id: pair_ids).includes(:member_1, :member_2).each do |pair|
       member_1 = pair.member_1
@@ -104,22 +104,22 @@ class Reminder < ActiveRecord::Base
       # TODO: refactor this
       c1 = Checkin.find_by(member_id: member_1.id, pair_id: pair.id, local_date: pair.local_date)
       c2 = Checkin.find_by(member_id: member_2.id, pair_id: pair.id, local_date: pair.local_date)
+      r1 = Reminder.find_by(member_id: member_1.id, pair_id: pair.id)
+      r2 = Reminder.find_by(member_id: member_2.id, pair_id: pair.id)
 
       next if c1 && c1.done? && c2 && c2.done?
       if c1.try(:done?)
         if !c2.try(:done?)
-          # send doer no reply messages to member_2
-          # send helper no reply messages to member_1
-          send_doer_helper_no_reply_messages(member_2, member_1)
+          r1.send_helper_no_reply_messages
+          r2.send_doer_no_reply_messages
         end
       else # !c1.done?
         if c2.try(:done?)
-          # send doer no reply messages to member_1
-          # send helper no reply messages to member_2
-          send_doer_helper_no_reply_messages(member_1, member_2)
+          r1.send_doer_no_reply_messages
+          r2.send_helper_no_reply_messages
         else
-          # send both no reply messages to member_1 and member_2
-          send_both_no_reply_messages(member_1, member_2)
+          r1.send_both_no_reply_messages
+          r2.send_both_no_reply_messages
         end
       end
 
@@ -130,40 +130,47 @@ class Reminder < ActiveRecord::Base
   # INSTANCE METHODS
   ##############################################################################
 
-  # TODO: unit tests
   def send_reminder
     # determine which text message(s) to send
-    member_message = Member::Message.new(member)
+    member_message  = Member::Message.new(member)
     message_strings = member_message.current_reminder_messages(activity_args)
 
-    # Send the messages using SMS
+    # Send 'em
     send_sms(message_strings)
-
     member.increment_reminder_count!
     mark_sent!
   end
 
-  # TODO: unit tests
-  # TODO: move elsewhere....
-  # TODO
-  def send_doer_helper_no_reply_messages doer, helper
+  def send_doer_no_reply_messages
     # determine which text message(s) to send
-    doer_message   = Member::Message.new(doer)
-    helper_message = Member::Message.new(helper)
-
-    doer_message_strings   = doer_message.current_doer_no_reply_messages
-    helper_message_strings = helper_message.current_helper_no_reply_messages
-
-    # Send the messages using SMS
+    doer = member
+    doer_message = Member::Message.new(doer)
+    doer_message_strings = doer_message.current_doer_no_reply_messages
     send_sms(doer_message_strings, doer)
-    send_sms(helper_message_strings, helper)
+    doer.increment_doer_no_reply_count!
 
-    # member.increment_reminder_count!
-    # mark_sent!
+    # DO NOT call mark_sent!
   end
 
+  def send_helper_no_reply_messages
+    helper = member
+    helper_message = Member::Message.new(helper)
+    helper_message_strings = helper_message.current_helper_no_reply_messages
+    send_sms(helper_message_strings, helper)
+    helper.increment_helper_no_reply_count!
 
-  # TODO: unit tests
+    # DO NOT call mark_sent!
+  end
+
+  def send_both_no_reply_messages
+    member_message = Member::Message.new(member)
+    member_message_strings = member_message.current_both_no_reply_messages
+    send_sms member_message_strings
+    member.increment_both_no_reply_count!
+
+    # DO NOT call mark_sent!
+  end
+
   def send_sms message_strings, m = nil
     Sms.create_and_send(
       from:    pair,
@@ -175,12 +182,6 @@ class Reminder < ActiveRecord::Base
   def activity_args
     activity_tenses = I18n.t("tandem.activities.#{pair.activity}")
     Hash[activity_tenses.map{|k,v| ["activity_#{k}".to_sym, v]}]
-  end
-
-  # TODO: unit tests
-  def to_s
-    "Reminder: #{id} Pair: #{pair_id}, Member: #{member}, Status: #{status},
-     Next Reminder Time: #{next_reminder_time_utc} ".squish
   end
 
   # TODO: unit tests
@@ -216,6 +217,12 @@ class Reminder < ActiveRecord::Base
 
   def checkin_done?
     checkin && checkin.done?
+  end
+
+  # TODO: unit tests
+  def to_s
+    "Reminder: #{id} Pair: #{pair_id}, Member: #{member}, Status: #{status},
+     Next Reminder Time: #{next_reminder_time_utc} ".squish
   end
 
   ##############################################################################

@@ -37,12 +37,12 @@ class Member < ActiveRecord::Base
            10 => :seen_second_doer_reschedule,
            11 => :seen_first_helper_reschedule,
            12 => :seen_second_helper_reschedule,
-           13 => :seen_first_no,
-           14 => :seen_second_no,
-           15 => :seen_first_other_no,
-           16 => :seen_second_other_no,
-           17 => :seen_first_both_no,
-           18 => :seen_second_both_no,
+           13 => :seen_first_doer_no_reply,
+           14 => :seen_second_doer_no_reply,
+           15 => :seen_first_helper_no_reply,
+           16 => :seen_second_helper_no_reply,
+           17 => :seen_first_both_no_reply,
+           18 => :seen_second_both_no_reply,
            column: "message_flags"
 
   ##############################################################################
@@ -236,6 +236,24 @@ class Member < ActiveRecord::Base
   # Does save
   def increment_helper_reschedule_count!
     increment_helper_reschedule_count
+    save
+  end
+
+  # TODO: unit tests
+  # Doesn't save
+  def increment_both_no_reply_count
+    return true if seen_second_both_no_reply?
+    if seen_first_both_no_reply
+      self.seen_second_both_no_reply = true
+    else
+      self.seen_first_both_no_reply  = true
+    end
+  end
+
+  # TODO: unit tests
+  # Does save
+  def increment_both_no_reply_count!
+    increment_both_no_reply_count
     save
   end
 
