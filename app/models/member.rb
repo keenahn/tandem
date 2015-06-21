@@ -16,6 +16,10 @@ class Member < ActiveRecord::Base
   # CONSTANTS
   ##############################################################################
 
+  NEUTRAL = 0
+  MALE    = 1
+  FEMALE  = 2
+
   ##############################################################################
   # MACROS
   ##############################################################################
@@ -48,6 +52,13 @@ class Member < ActiveRecord::Base
   ##############################################################################
   # ATTRIBUTES
   ##############################################################################
+
+  # This automatically adds the predicates male? female? neutral?
+  enum gender: {
+    male:     MALE,
+    female:   FEMALE,
+    neutral:  NEUTRAL
+  }
 
   ##############################################################################
   # RELATIONSHIPS
@@ -293,7 +304,8 @@ class Member < ActiveRecord::Base
   end
 
   def set_defaults
-    self.active = true
+    self.active = true if self.active.nil?
+    self.gender ||= :neutral
     true
   end
 
