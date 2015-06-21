@@ -53,6 +53,7 @@ class Pair < ActiveRecord::Base
   belongs_to :member_2, class_name: "Member"
   has_many :checkins, dependent: :destroy
   has_many :reminders
+  delegate :owner, to: :group
 
   ##############################################################################
   # VALIDATIONS
@@ -76,6 +77,7 @@ class Pair < ActiveRecord::Base
 
   after_save do
     update_checkins_reminders
+    update_group_memberships
   end
 
 
@@ -183,6 +185,7 @@ class Pair < ActiveRecord::Base
 
   private
 
+  # TODO: unit tests
   def set_defaults
     self.active          = true
     self.tandem_number   ||= Phoner::Phone.parse(TwilioClient::DEFAULT_FROM_NUMBER + "").to_s
@@ -192,16 +195,24 @@ class Pair < ActiveRecord::Base
     end
   end
 
+  # TODO: unit tests
   def members_different
     errors.add(:base, I18n.t("tandem.errors.members_not_different")) if member_1_id == member_2_id
   end
 
+  # TODO: unit tests
   def update_checkins_reminders
     if active?
       create_checkin_and_reminders
     else
       reminders.destroy_all
     end
+  end
+
+  # TODO: unit tests
+  def update_group_memberships
+    member_1.add_to_group group
+    member_2.add_to_group group
   end
 
 
