@@ -17,7 +17,7 @@ class Reminder < ActiveRecord::Base
   #   a. we might be late with sending the reminders
   #   b. we might not want to trigger the sending job every minute
   #
-  DEFAULT_WINDOW  = 15
+  DEFAULT_WINDOW  = 1
 
   # How much after the initial reminder to send the no_reply message
   NO_REPLY_MINUTES = 10
@@ -145,7 +145,7 @@ class Reminder < ActiveRecord::Base
     # determine which text message(s) to send
     doer = member
     doer_message = Member::Message.new(doer)
-    doer_message_strings = doer_message.current_doer_no_reply_messages
+    doer_message_strings = doer_message.current_doer_no_reply_messages(activity_args)
     send_sms(doer_message_strings, doer)
     doer.increment_doer_no_reply_count!
 
@@ -155,7 +155,7 @@ class Reminder < ActiveRecord::Base
   def send_helper_no_reply_messages
     helper = member
     helper_message = Member::Message.new(helper)
-    helper_message_strings = helper_message.current_helper_no_reply_messages
+    helper_message_strings = helper_message.current_helper_no_reply_messages(activity_args)
     send_sms(helper_message_strings, helper)
     helper.increment_helper_no_reply_count!
 
@@ -164,7 +164,7 @@ class Reminder < ActiveRecord::Base
 
   def send_both_no_reply_messages
     member_message = Member::Message.new(member)
-    member_message_strings = member_message.current_both_no_reply_messages
+    member_message_strings = member_message.current_both_no_reply_messages(activity_args)
     send_sms member_message_strings
     member.increment_both_no_reply_count!
 
