@@ -2,7 +2,7 @@
   %h1
     = t("tandem.general.your_groups")
     - if @groups.any?
-      %span= "(#{@groups.count})"
+      %span.detail= "(#{@groups.count})"
   - if @groups.any?
     %table.table.table-striped
       %thead

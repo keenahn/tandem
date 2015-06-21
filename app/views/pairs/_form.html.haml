@@ -2,12 +2,17 @@
 = form_for @pair do |f|
   - if @pair.errors.any?
     #error_explanation
-      %h2= "#{pluralize(pair.errors.count, "error")} prohibited this pair from being saved:"
+      %h2= "#{pluralize(@pair.errors.count, "error")} prohibited this pair from being saved:"
       %ul
         - @pair.errors.full_messages.each do |msg|
           %li= msg
 
-  = f.hidden_field :group_id, value: @group.id
+  - if @group
+    = f.hidden_field :group_id, value: @group.id
+  - else
+    .field
+      = f.label :group_id
+      = collection_select :pair, :group_id, current_user.groups, :id, :name, {}, { class: "select2" }
 
   .field
     = f.label :member_1_id

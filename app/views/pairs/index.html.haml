@@ -1,4 +1,9 @@
-%h1=  Pair.model_name.plural.capitalize
+%h1
+  = Pair.model_name.plural.capitalize
+  - if @group
+    %span.detail= "(#{Group.model_name}: #{@group.name})"
+  - elsif @pairs.any?
+    %span.detail= "(#{@pairs.count})"
 
 - if @pairs.any?
   %table.table.table-striped
@@ -17,8 +22,8 @@
       - @pairs.each do |pair|
         %tr
           %td= pair.group
-          %td= pair.member_1
-          %td= pair.member_2
+          %td= link_to pair.member_1, edit_member_path(pair.member_1)
+          %td= link_to pair.member_2, edit_member_path(pair.member_2)
           %td= t("tandem.activities.#{pair.activity}.noun").titleize
           %td= pair.active?
           %td= pair.time_zone

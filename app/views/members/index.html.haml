@@ -5,8 +5,10 @@
 .page-header
   %h1
     = t("tandem.general.group_members")
-    - if @members.any?
-      %span= "(#{@members.count})"
+    - if @group
+      %span.detail= "(#{Group.model_name}: #{@group.name})"
+    - elsif @members.any?
+      %span.detail= "(#{@members.count})"
 - if @members.any?
   %table.table.table-striped.members-table
     %thead
