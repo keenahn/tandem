@@ -100,6 +100,7 @@ class Checkin < ActiveRecord::Base
     r.update_attributes(
       next_reminder_time_utc: pair.next_reminder_time_utc,
       status: :unsent,
+      last_no_reply_sent_time_utc: nil
     )
     r.save ? r : nil
   end

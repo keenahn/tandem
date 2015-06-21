@@ -86,7 +86,7 @@ class Reminder < ActiveRecord::Base
   def self.pair_ids_for_no_reply_messages window = NO_REPLY_WINDOW, no_reply_minutes = NO_REPLY_MINUTES
     oldest_reminder_sent_time = Time.now - no_reply_minutes.minutes
     time_range = (oldest_reminder_sent_time - window.minutes)..oldest_reminder_sent_time
-    return Reminder.sent.where(last_reminder_time_utc: time_range).pluck(:pair_id).uniq
+    return Reminder.sent.where(last_reminder_time_utc: time_range, last_no_reply_sent_time_utc: nil).pluck(:pair_id).uniq
   end
 
   # TODO: unit tests
@@ -142,14 +142,12 @@ class Reminder < ActiveRecord::Base
   end
 
   def send_doer_no_reply_messages
-    # determine which text message(s) to send
     doer = member
     doer_message = Member::Message.new(doer)
     doer_message_strings = doer_message.current_doer_no_reply_messages(activity_args)
     send_sms(doer_message_strings, doer)
     doer.increment_doer_no_reply_count!
-
-    # DO NOT call mark_sent!
+    mark_no_reply_sent!
   end
 
   def send_helper_no_reply_messages
@@ -158,8 +156,7 @@ class Reminder < ActiveRecord::Base
     helper_message_strings = helper_message.current_helper_no_reply_messages(activity_args)
     send_sms(helper_message_strings, helper)
     helper.increment_helper_no_reply_count!
-
-    # DO NOT call mark_sent!
+    mark_no_reply_sent!
   end
 
   def send_both_no_reply_messages
@@ -167,8 +164,7 @@ class Reminder < ActiveRecord::Base
     member_message_strings = member_message.current_both_no_reply_messages(activity_args)
     send_sms member_message_strings
     member.increment_both_no_reply_count!
-
-    # DO NOT call mark_sent!
+    mark_no_reply_sent!
   end
 
   def send_sms message_strings, m = nil
@@ -196,6 +192,15 @@ class Reminder < ActiveRecord::Base
 
   def mark_sent!
     mark_sent
+    save
+  end
+
+  def mark_no_reply_sent
+    self.last_no_reply_sent_time_utc = Time.now.utc
+  end
+
+  def mark_no_reply_sent!
+    mark_no_reply_sent
     save
   end
 
