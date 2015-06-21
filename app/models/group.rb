@@ -48,6 +48,7 @@ class Group < ActiveRecord::Base
   ##############################################################################
 
   scope :ordered, -> { order(:name) }
+  scope :owned_by, ->(user_id) { where(owner_id: user_id)}
 
   ##############################################################################
   # CLASS METHODS

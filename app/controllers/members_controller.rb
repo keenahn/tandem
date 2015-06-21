@@ -3,17 +3,20 @@
 # TODO: clean up controller spec too
 # TODO: change all magic strings to live in translation dictionaries
 class MembersController < ApplicationController
+  include Pundit
 
   before_action :set_member, only: [:show, :edit, :update, :destroy]
   before_action :set_group
+
+  rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
   # GET /members
   # GET /members.json
   def index
     if params[:group_id]
       @members = Member.in_group params[:group_id]
-    else
-      @members = Member.all
+    elsif current_user
+      @members = policy_scope(Member)
     end
 
   end
@@ -25,7 +28,7 @@ class MembersController < ApplicationController
 
   # GET /members/new
   def new
-    @member = Member.new
+    @member = Member.new(active: true)
   end
 
   # GET /members/1/edit
@@ -42,7 +45,7 @@ class MembersController < ApplicationController
       format.html {
         return render :new unless @member
         # TODO: internationalize
-        redirect_to(@member, notice: "Member was successfully created.")
+        redirect_to(group_members_path(@group), notice: "Member was successfully created.")
       }
 
       format.json {
@@ -95,7 +98,7 @@ class MembersController < ApplicationController
     respond_to do |format|
       if @member.update(member_params)
         # TODO: internationalize
-        format.html { redirect_to @member, notice: "Member was successfully updated." }
+        format.html { redirect_to @group ? group_members_path(@group) : members_path, notice: "Member was successfully updated." }
         format.json { render :show, status: :ok, location: @member }
       else
         format.html { render :edit }
@@ -110,7 +113,7 @@ class MembersController < ApplicationController
     @member.destroy
     respond_to do |format|
       # TODO: internationalize
-      format.html { redirect_to members_url, notice: "Member was successfully destroyed." }
+      format.html { redirect_to @group ? group_members_path(@group) : members_path, notice: "Member was successfully destroyed." }
       format.json { head :no_content }
     end
   end

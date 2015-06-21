@@ -3,15 +3,18 @@
 # TODO: clean up controller spec too
 # TODO: change all magic strings to live in translation dictionaries
 class PairsController < ApplicationController
+  include Pundit
 
   before_action :set_pair, only: [:show, :edit, :update, :destroy]
   before_action :set_group, except: [:create]
 
+  rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
+
   def index
     if params[:group_id]
       @pairs = Pair.in_group params[:group_id]
-    else
-      @pairs = Pair.all
+    elsif current_user
+      @pairs = policy_scope(Pair)
     end
   end
 

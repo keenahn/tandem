@@ -1,6 +1,9 @@
 = cache "user-#{current_user.updated_at.to_i}" do
-  - if current_user.groups?
-    %h1= t("tandem.general.your_groups")
+  %h1
+    = t("tandem.general.your_groups")
+    - if @groups.any?
+      %span= "(#{@groups.count})"
+  - if @groups.any?
     %table.table.table-striped
       %thead
         %tr
@@ -13,5 +16,5 @@
           %th= Group.human_attribute_name(:pairs)
           %th= t '.actions', default: t("helpers.actions")
       %tbody
-        = render partial: "groups/row", collection: current_user.groups.ordered, as: :group, cache: true
-  %p= link_to t('.new', default: t("helpers.links.new")), new_group_path, class: 'btn btn-primary'
+        = render partial: "groups/row", collection: @groups.ordered, as: :group, cache: true
+  %p= link_to t('.new', default: t('helpers.links.new')), new_group_path, class: 'btn btn-primary'

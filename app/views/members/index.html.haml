@@ -3,20 +3,24 @@
     TANDEM.members.index.bulk_import_group_members_path = "#{bulk_import_group_members_path(@group.id)}"
 
 .page-header
-  %h1= t ".title", default: Member
-%table.table.table-striped.members-table
-  %thead
-    %tr
-      %th ID
-      %th= Member.human_attribute_name(:name)
-      %th= Member.human_attribute_name(:phone_number)
-      %th= Member.human_attribute_name(:time_zone)
-      %th= Member.human_attribute_name(:active)
-      %th= Member.human_attribute_name(:created_at)
-      %th= t ".actions", default: t("helpers.actions")
-  %tbody
-    - @members.each do |member|
-      = render partial: "members/row", locals: {member: member}
+  %h1
+    = t("tandem.general.group_members")
+    - if @members.any?
+      %span= "(#{@members.count})"
+- if @members.any?
+  %table.table.table-striped.members-table
+    %thead
+      %tr
+        %th ID
+        %th= Member.human_attribute_name(:name)
+        %th= Member.human_attribute_name(:phone_number)
+        %th= Member.human_attribute_name(:time_zone)
+        %th= Member.human_attribute_name(:active)
+        %th= Member.human_attribute_name(:created_at)
+        %th= t ".actions", default: t("helpers.actions")
+    %tbody
+      - @members.each do |member|
+        = render partial: "members/row", locals: {member: member}
 
 = link_to t(".new", default: t("helpers.links.new")), @group ? new_group_member_path : new_member_path, class: "btn btn-primary"
 - if @group

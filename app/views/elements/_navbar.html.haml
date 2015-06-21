@@ -10,12 +10,15 @@
   / Collect the nav links, forms, and other content for toggling
   #navbar-collapse-1.collapse.navbar-collapse
     %ul.nav.navbar-nav
+      %li= link_to Group.model_name.plural.capitalize, groups_path
+      %li= link_to Pair.model_name.plural.capitalize, pairs_path
+      %li= link_to Member.model_name.plural.capitalize, members_path
     %ul.nav.navbar-nav.navbar-right
       - if defined?(Devise)
         - if user_signed_in?
           %li.dropdown
             %a.dropdown-toggle{"data-toggle" => "dropdown", href: "#"}
-              Account
+              = current_user.username
               %b.caret
             %ul.dropdown-menu
               %li= link_to t("tandem.general.edit_account"), edit_user_path

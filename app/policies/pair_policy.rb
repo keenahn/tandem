@@ -1,5 +1,5 @@
-# Policy for manipulating groups
-class GroupPolicy < ApplicationPolicy
+# Policy for manipulating pairs
+class PairPolicy < ApplicationPolicy
 
   # Scope for groups
   class Scope < Scope
@@ -28,7 +28,8 @@ class GroupPolicy < ApplicationPolicy
   private
 
   def owns?
-    record.owner_id == user.id
+    # TODO: refactor this?
+    user.pairs.where(id: record.id).exist?
   end
 
 end

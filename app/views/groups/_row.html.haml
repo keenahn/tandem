@@ -1,7 +1,7 @@
 -# expects group to be passed in as a local
 %tr
   -# %td= group.id
-  %td= link_to group.name, group
+  %td= group.name # link_to group.name, group
   %td= group.description
   %td= group.time_zone
   %td= l group.created_at, format: :long

@@ -28,6 +28,7 @@ Rails.application.routes.draw do
     get    "signup"  => "users/registrations#new",    as: :signup
     post   "signup"  => "users/registrations#create"
     put    "signup"  => "users/registrations#update"
+    delete "signup"  => "users/registrations#destroy"
     get    "account" => "users/registrations#edit",   as: :edit_user
   end
 

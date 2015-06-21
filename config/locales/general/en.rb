@@ -1,8 +1,16 @@
 {
   en: {
+    activerecord: {
+      models: {
+        group: "Group",
+        member: "Member",
+        pair: "Pair",
+      },
+    },
     tandem: {
       general: {
         your_groups: "Your Groups",
+        group_members: "Group Members",
         edit_account: "Edit Account",
         logout: "Log Out",
         login: "Login",

@@ -88,6 +88,12 @@ class Member < ActiveRecord::Base
     none
   }
 
+  scope :owned_by, ->(user_id) {
+    gids_sql  = Group.where(owner_id: 1).select(:id).to_sql
+    gmids_sql = GroupMembership.where("group_memberships.group_id IN (#{gids_sql})").select(:member_id).to_sql
+    Member.where("#{table_name}.id IN (#{gmids_sql})")
+  }
+
   # TODO: move to class method?
   scope :has_active_pair, ->{
     subq_1 = Pair.active.select(:member_1_id).to_sql

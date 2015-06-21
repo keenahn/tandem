@@ -5,10 +5,8 @@ class MemberPolicy < ApplicationPolicy
   class Scope < Scope
 
     def resolve
-      return nil unless user
-      group_ids = user.groups.pluck(:id)
-      member_ids = GroupMembership.where(group_id: group_ids).pluck(:member_id)
-      return scope.where(id: member_ids)
+      return scope.owned_by(user.id) if user
+      nil
     end
 
   end
@@ -32,6 +30,7 @@ class MemberPolicy < ApplicationPolicy
   private
 
   def owns?
+    # TODO: fix?
     record.owner_id == user.id
   end
 

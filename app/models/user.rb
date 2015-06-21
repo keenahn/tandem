@@ -81,6 +81,15 @@ class User < ActiveRecord::Base
     # false
   end
 
+  # TODO: unit tests
+  def pairs
+    Pair.owned_by(id)
+  end
+
+  def members
+    Member.owned_by(id)
+  end
+
   ##############################################################################
   # PRIVATE METHODS
   ##############################################################################

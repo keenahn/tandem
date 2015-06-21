@@ -36,4 +36,5 @@
 
 
   .actions
-    = f.submit 'Save'
+    = f.submit nil, class: "btn btn-primary"
+    = link_to t(".cancel", default: t("helpers.links.cancel")), @group ? group_pairs_path(@group.id) : pairs_path, class: "btn btn-default"

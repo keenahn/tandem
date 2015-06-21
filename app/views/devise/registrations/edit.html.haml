@@ -15,5 +15,5 @@
     = f.button :submit, "Update"
 %h3 Cancel my account
 %p
-  Unhappy? #{link_to "Cancel my account", signup_path(resource_name), data: { confirm: "Are you sure?" }, method: :delete}
+  Unhappy? #{link_to "Cancel my account", signup_path(), data: { confirm: "Are you sure?" }, method: :delete}
 = link_to "Back", :back
