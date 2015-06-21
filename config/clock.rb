@@ -14,13 +14,28 @@ module Clockwork
     CreateCheckinsAndRemindersJob.perform_later
   }
 
-  mutliples_of_five = (0..11).to_a.map{|x| "**:#{(x*5).to_s.rjust(2, '0')}"}
+  #
+  # DEFAULT_WINDOW  = 5
 
-  every(1.hour, "Send 'No Reply' messages", at: []){
+  # # How much after the initial reminder to send the no_reply message
+  # NO_REPLY_MINUTES = 10
+
+  # # How often we'll be sending the no_reply messages
+  # NO_REPLY_WINDOW = 5
+
+  no_reply_multiples = (0..(60/Reminder::NO_REPLY_WINDOW - 1)).to_a.map{ |x|
+    "**:#{(x*Reminder::NO_REPLY_WINDOW).to_s.rjust(2, '0')}"
+  }
+
+  reminder_multiples = (0..(60/Reminder::DEFAULT_WINDOW - 1)).to_a.map{ |x|
+    "**:#{(x*Reminder::DEFAULT_WINDOW).to_s.rjust(2, '0')}"
+  }
+
+  every(1.hour, "Send 'No Reply' messages", at: no_reply_multiples){
     SendNoReplyMessagesJob.perform_later
   }
 
-  every(Reminder::DEFAULT_WINDOW.minutes, "Send reminders"){
+  every(1.hour, "Send reminders", at: reminder_multiples){
     SendRemindersJob.perform_later
   }
 

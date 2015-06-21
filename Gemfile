@@ -51,7 +51,8 @@ end
 
 group :staging, :production do
   gem "rails_12factor"            # https://devcenter.heroku.com/articles/ruby-support#injected-plugins
-  gem "unicorn"                   # Use unicorn as the app server
+  # gem "unicorn"                   # Use unicorn as the app server
+  gem "puma"                        # Use Puma webserver
 end
 
 group :test do
