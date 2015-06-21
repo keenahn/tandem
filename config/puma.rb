@@ -1,7 +1,7 @@
 environment ENV['RACK_ENV']
-threads 0,5
+threads 0,3
 
-workers 3
+workers 1
 preload_app!
 @clock_pid = nil
 @jobs_pid = nil
