@@ -270,6 +270,17 @@ class Member < ActiveRecord::Base
     c.create_or_update_reminder
   end
 
+
+  # TODO: unit tests
+  def add_to_group g
+    GroupMembership.find_or_create_by(member_id: id, group_id: g.id)
+  end
+
+  # TODO: unit tests
+  def remove_from_group g
+    GroupMembership.where(member_id: id, group_id: g.id).destroy_all
+  end
+
   ##############################################################################
   # PRIVATE METHODS
   ##############################################################################

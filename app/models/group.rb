@@ -66,6 +66,12 @@ class Group < ActiveRecord::Base
     GroupMembership.find_or_create_by(group_id: id, member_id: m.id)
   end
 
+  # TODO: unit tests
+  def remove_member m
+    GroupMembership.where(member_id: m.id, group_id: id).destroy_all
+  end
+
+
   ##############################################################################
   # PRIVATE METHODS
   ##############################################################################
