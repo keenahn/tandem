@@ -44,7 +44,8 @@ class Checkin < ActiveRecord::Base
   # SCOPES
   ##############################################################################
 
-  # TODO
+  scope :done, -> { where("#{table_name}.done_at IS NOT NULL") }
+  scope :undone, -> { where("#{table_name}.done_at IS NULL") }
 
   ##############################################################################
   # CLASS METHODS
@@ -94,6 +95,7 @@ class Checkin < ActiveRecord::Base
 
   # TODO: unit tests
   def create_or_update_reminder
+    return true if done?
     r = Reminder.find_or_initialize_by(pair_id: pair_id, member_id: member_id)
     r.update_attributes(
       next_reminder_time_utc: pair.next_reminder_time_utc,
