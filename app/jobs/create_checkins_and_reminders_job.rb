@@ -2,7 +2,7 @@
 class CreateCheckinsAndRemindersJob  < ActiveJob::Base
 
   def perform
-    Concerns::CheckinReminderCreator.create_all_for_hour
+    Concerns::CheckinsRemindersCreator.create_all_for_hour
   end
 
 end

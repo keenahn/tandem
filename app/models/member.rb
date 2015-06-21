@@ -257,8 +257,12 @@ class Member < ActiveRecord::Base
     save
   end
 
-
-
+  # TODO: unit tests
+  def create_checkin_and_reminder p
+    c = Checkin.find_or_initialize_by(member: self, pair: p, local_date: local_date)
+    c.save
+    c.create_or_update_reminder
+  end
 
   ##############################################################################
   # PRIVATE METHODS
@@ -283,6 +287,7 @@ class Member < ActiveRecord::Base
 
   # TODO: unit tests
   def deactivate_pairs
+    return true if active?
     pairs.each{ |x| x.deactivate! }
   end
 

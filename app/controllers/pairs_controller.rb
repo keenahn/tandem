@@ -23,6 +23,7 @@ class PairsController < ApplicationController
   end
 
   def edit
+
   end
 
   # TODO: I18n

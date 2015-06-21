@@ -1,6 +1,5 @@
 # A class representing an SMS message
 class Sms < ActiveRecord::Base
-
   include ActiveSupport::Configurable
 
   validates :to_id,   presence: true
@@ -32,7 +31,7 @@ class Sms < ActiveRecord::Base
   end
 
   def send_sms
-    return puts inspect if dry_run?
+    return puts(inspect) if dry_run?
     TwilioClient.sms to_number, message
   end
 

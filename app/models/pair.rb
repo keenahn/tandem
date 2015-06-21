@@ -32,7 +32,6 @@ class Pair < ActiveRecord::Base
     :reminder_time_fri,
   ]
 
-
   ALL_REMINDER_TIME_FIELDS = WEEKDAY_REMINDER_TIME_FIELDS + WEEKEND_REMINDER_TIME_FIELDS
 
   ##############################################################################
@@ -42,6 +41,8 @@ class Pair < ActiveRecord::Base
   ##############################################################################
   # ATTRIBUTES
   ##############################################################################
+
+
 
   ##############################################################################
   # RELATIONSHIPS
@@ -72,6 +73,12 @@ class Pair < ActiveRecord::Base
   before_validation(on: :create) do
     set_defaults
   end
+
+  after_save do
+    update_checkins_reminders
+  end
+
+
 
   ##############################################################################
   # SCOPES
@@ -162,6 +169,10 @@ class Pair < ActiveRecord::Base
     tandem_number
   end
 
+  def create_checkin_and_reminders
+    members.each{|m| m.create_checkin_and_reminder(self) }
+  end
+
   ##############################################################################
   # PRIVATE METHODS
   ##############################################################################
@@ -180,6 +191,15 @@ class Pair < ActiveRecord::Base
   def members_different
     errors.add(:base, I18n.t("tandem.errors.members_not_different")) if member_1_id == member_2_id
   end
+
+  def update_checkins_reminders
+    if active?
+      create_checkin_and_reminders
+    else
+      reminders.destroy_all
+    end
+  end
+
 
 
 end
