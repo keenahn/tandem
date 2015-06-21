@@ -23,7 +23,7 @@ class GroupsController < ApplicationController
 
   # GET /groups/new
   def new
-    @group = Group.new(active: true)
+    @group = Group.new # (active: true)
   end
 
   # GET /groups/1/edit
