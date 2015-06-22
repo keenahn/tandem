@@ -75,12 +75,14 @@ class Pair < ActiveRecord::Base
     set_defaults
   end
 
+  after_save(on: :create) do
+    send_welcome_messages
+  end
+
   after_save do
     update_checkins_reminders
     update_group_memberships
   end
-
-
 
   ##############################################################################
   # SCOPES
@@ -215,6 +217,23 @@ class Pair < ActiveRecord::Base
     member_2.add_to_group group
   end
 
+  def send_welcome_messages
+    template = "onboarding_simultaneous_same_activities"
+    members.each{ |m|
+      messages = Tandem::Message.message_strings(template, welcome_message_args(m))
+      Sms.create_and_send(from: self, to: m, message: messages)
+    }
+  end
+
+  def welcome_message_args mem
+    partner = other_member(mem)
+    Tandem::Message.activity_tenses(activity).merge(
+      product_name: I18n.t("tandem.general.product_name"),
+      member_first_name: mem.first_name,
+      partner_first_name: partner.first_name,
+      display_time: Tandem::Utils.short_time(reminder_time),
+    )
+  end
 
 
 end
