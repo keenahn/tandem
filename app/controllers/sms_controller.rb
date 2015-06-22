@@ -70,19 +70,36 @@ class SmsController < ApplicationController
   # TODO: unit tests
   def send_yes_response_doer checkin
     # TODO: move this logic of which message to member_message class
-    doer_message = Tandem::Message.message_string("yes_response_doer")
+    doer_message = Tandem::Message.message_string("yes_response_doer", yes_response_args(checkin))
     member = checkin.member
     Sms.create_and_send(from: checkin.pair, to: member, message: doer_message)
     member.increment_doer_yes_count!
   end
 
   # TODO: unit tests
+  # TODO: move elsewhere?
+  def yes_response_args checkin
+    doer                = checkin.member
+    helper              = checkin.other_member
+    doer_first_name     = doer.first_name
+    helper_first_name   = helper.first_name
+    activity_args       = Tandem::Message.activity_tenses(checkin.activity)
+    doer_pronoun_object = Tandem::Message.gender_pronouns(doer.gender)[:pronoun_object]
+    ret = activity_args.merge(
+      doer_first_name: doer_first_name,
+      helper_first_name: helper_first_name,
+      doer_pronoun_object: doer_pronoun_object
+    )
+    ret
+  end
+
+  # TODO: unit tests
   def send_yes_response_helper checkin
-    partner = checkin.other_member
-    member_message = Member::Message.new(partner)
-    helper_messages = member_message.current_helper_yes_messages
-    Sms.create_and_send(from: checkin.pair, to: partner, message: helper_messages)
-    partner.increment_helper_yes_count!
+    helper = checkin.other_member
+    member_message = Member::Message.new(helper)
+    helper_messages = member_message.current_helper_yes_messages(yes_response_args(checkin))
+    Sms.create_and_send(from: checkin.pair, to: helper, message: helper_messages)
+    helper.increment_helper_yes_count!
   end
 
   def get_reschedule_time reschedule_time_string, pair
@@ -92,6 +109,7 @@ class SmsController < ApplicationController
   end
 
   # TODO: unit tests
+  # TODO: split up more?
   def handle_reschedule checkin, body
     reschedule_time_string = extract_time(body)
     return twiml(Tandem::Message.message_string("bad_time")) unless reschedule_time_string
@@ -146,35 +164,59 @@ class SmsController < ApplicationController
 
 
   # TODO: unit tests
-  # TODO
   def reschedule_and_notify checkin, reschedule_time
     reminder = checkin.reminder
     reminder.reschedule(reschedule_time)
-    send_reschedule_response_doer(checkin)
-    send_reschedule_response_helper(checkin)
+    send_reschedule_response_doer(checkin, reschedule_time)
+    send_reschedule_response_helper(checkin, reschedule_time)
     render_nothing
   end
 
   # TODO: unit tests
-  def send_reschedule_response_doer checkin
+  def send_reschedule_response_doer checkin, reschedule_time
     member = checkin.member
     # TODO: move this logic of which message to member_message class
-    doer_message = Tandem::Message.message_string("reschedule_doer")
+    reschedule_args = reschedule_response_args(checkin, reschedule_time)
+    doer_message = Tandem::Message.message_string("reschedule_doer", reschedule_args)
     Sms.create_and_send(from: checkin.pair, to: member, message: doer_message)
     member.increment_doer_reschedule_count!
   end
 
   # TODO: unit tests
-  def send_reschedule_response_helper checkin
+  def send_reschedule_response_helper checkin, reschedule_time
     partner = checkin.other_member
     member_message = Member::Message.new(partner)
-    helper_message = member_message.current_reschedule_response_messages
+    reschedule_args = reschedule_response_args(checkin, reschedule_time)
+    helper_message = member_message.current_reschedule_response_messages(reschedule_args)
     Sms.create_and_send(from: checkin.pair, to: partner, message: helper_message)
     partner.increment_helper_reschedule_count!
   end
 
   # TODO: unit tests
+  def reschedule_response_args checkin, reschedule_time
+    reschedule_time         = Tandem::Utils.short_time(reschedule_time)
+    doer                    = checkin.member
+    helper                  = checkin.other_member
+    doer_first_name         = doer.first_name
+    helper_first_name       = helper.first_name
+    activity_args           = Tandem::Message.activity_tenses(checkin.activity)
+    doer_pronouns           = Tandem::Message.gender_pronouns(doer.gender)
+    doer_pronoun_object     = doer_pronouns[:pronoun_object]
+    doer_pronoun_possessive = doer_pronouns[:pronoun_possessive]
+
+    ret = activity_args.merge(
+      doer_first_name:         doer_first_name,
+      helper_first_name:       helper_first_name,
+      doer_pronoun_object:     doer_pronoun_object,
+      doer_pronoun_possessive: doer_pronoun_possessive,
+      reschedule_time:         reschedule_time
+    )
+    ret
+  end
+
+  # TODO: unit tests
   def handle_am_pm
+    # TODO! Make work!
   end
 
   # TODO: unit tests
@@ -185,16 +227,17 @@ class SmsController < ApplicationController
     # Alert the partner
   end
 
+  # TODO: unit tests
   def extract_time s
     time_pattern = /\b([0-9]|0[0-9]|1?[0-9]|2[0-3]):[0-5][0-9]/i # matches time 10:23 and similar
     return time_pattern.match(s)[0] if time_pattern.match(s)
     nil
   end
 
+  # TODO: unit tests
   def extract_am_pm s
-
+    # TODO! Make work
   end
-
 
   # TODO: unit tests
   def matches_yes? s
