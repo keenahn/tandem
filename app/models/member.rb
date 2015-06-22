@@ -274,6 +274,43 @@ class Member < ActiveRecord::Base
     save
   end
 
+
+  # TODO: unit tests
+  # Doesn't save
+  def increment_doer_no_reply_count
+    return true if seen_second_doer_no_reply?
+    if seen_first_doer_no_reply
+      self.seen_second_doer_no_reply = true
+    else
+      self.seen_first_doer_no_reply  = true
+    end
+  end
+
+  # TODO: unit tests
+  # Does save
+  def increment_doer_no_reply_count!
+    increment_doer_no_reply_count
+    save
+  end
+
+  # TODO: unit tests
+  # Doesn't save
+  def increment_helper_no_reply_count
+    return true if seen_second_helper_no_reply?
+    if seen_first_helper_no_reply
+      self.seen_second_helper_no_reply = true
+    else
+      self.seen_first_helper_no_reply  = true
+    end
+  end
+
+  # TODO: unit tests
+  # Does save
+  def increment_helper_no_reply_count!
+    increment_helper_no_reply_count
+    save
+  end
+
   # TODO: unit tests
   def create_checkin_and_reminder p
     c = Checkin.find_or_initialize_by(member: self, pair: p, local_date: local_date)
