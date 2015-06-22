@@ -292,6 +292,13 @@ class Member < ActiveRecord::Base
     GroupMembership.where(member_id: id, group_id: g.id).destroy_all
   end
 
+  # TODO: unit tests
+  def first_name
+    np = People::NameParser.new
+    name_obj = np.parse(name)
+    name_obj[:first] || name
+  end
+
   ##############################################################################
   # PRIVATE METHODS
   ##############################################################################
