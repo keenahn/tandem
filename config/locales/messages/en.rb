@@ -15,7 +15,7 @@ class TandemStrings
               present_participle: "meditating",
               short_noun: "'tate",
               simple_present: "meditate",
-              simple_present_cap: "Meditation", # capitalized
+              simple_present_cap: "Meditate", # capitalized
             },
             work_out: {
               infinitive: "to work out",
