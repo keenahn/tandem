@@ -76,7 +76,7 @@ describe SmsController do
         "Body"  => "Yes, doing it now!",
         "extra" => "Doesn't matter"
       }
-      checkin = FactoryGirl.create(:checkin, pair: pair, member: member)
+      # checkin = FactoryGirl.create(:checkin, pair: pair, member: member)
       expect_and_call_original :handle_yes
       expect(response.status).to eq(200)
       post(:receive, params)
@@ -89,7 +89,8 @@ describe SmsController do
       @member = @pair.member_1
       @pair.set_all_reminder_times "09:00"
       @pair.save
-      @checkin  = FactoryGirl.create(:checkin, pair: @pair, member: @member, local_date: @pair.local_date)
+      @checkin = Checkin.find_by(pair_id: @pair.id, member_id: @member.id, local_date: @pair.local_date)
+      # @checkin  = FactoryGirl.create(:checkin, pair: @pair, member: @member, local_date: @pair.local_date)
       @reminder = @checkin.create_or_update_reminder
 
       @local_date_string = @pair.local_date.strftime(Tandem::Consts::DEFAULT_DATE_FORMAT)
