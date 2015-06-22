@@ -24,6 +24,8 @@ class Checkin < ActiveRecord::Base
   belongs_to :member
   belongs_to :pair
   delegate :group, to: :pair
+  delegate :activity, to: :pair
+
 
   ##############################################################################
   # VALIDATIONS
