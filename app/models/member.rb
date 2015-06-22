@@ -296,7 +296,7 @@ class Member < ActiveRecord::Base
   def first_name
     np = People::NameParser.new
     name_obj = np.parse(name)
-    name_obj[:first] || name
+    name_obj[:first].capitalize || name.capitalize
   end
 
   ##############################################################################
