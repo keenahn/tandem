@@ -28,7 +28,6 @@ class Sms < ActiveRecord::Base
     # p[:message] = messages.join("\n\n")
     # s = create(p)
     # s.delay_send_sms
-    messages = Array(p.delete(:message)) # will Array'ize single elements
     wait = 0
     messages.each{|m|
       s = create p.merge({message: m})
