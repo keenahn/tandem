@@ -18,5 +18,16 @@ module Tandem
       self.message_strings(template_name, extras).first
     end
 
+    # TODO: unit tests
+    def self.activity_tenses act
+      activity_tenses = I18n.t("tandem.activities.#{act}")
+      Hash[activity_tenses.map{|k,v| ["activity_#{k}".to_sym, v]}]
+    end
+
+    def self.gender_pronouns gender
+      pronouns = I18n.t("tandem.pronouns.#{gender}")
+      Hash[pronouns.map{|k,v| ["pronoun_#{k}".to_sym, v]}]
+    end
+
   end
 end

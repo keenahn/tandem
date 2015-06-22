@@ -176,8 +176,7 @@ class Reminder < ActiveRecord::Base
   end
 
   def activity_args
-    activity_tenses = I18n.t("tandem.activities.#{pair.activity}")
-    Hash[activity_tenses.map{|k,v| ["activity_#{k}".to_sym, v]}]
+    Tandem::Message.activity_tenses(pair.activity)
   end
 
   # TODO: unit tests
