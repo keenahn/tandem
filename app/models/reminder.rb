@@ -144,7 +144,7 @@ class Reminder < ActiveRecord::Base
   def send_doer_no_reply_messages
     doer = member
     doer_message = Member::Message.new(doer)
-    doer_message_strings = doer_message.current_doer_no_reply_messages(activity_args)
+    doer_message_strings = doer_message.current_doer_no_reply_messages(no_reply_args)
     send_sms(doer_message_strings, doer)
     doer.increment_doer_no_reply_count!
     mark_no_reply_sent!
@@ -153,7 +153,7 @@ class Reminder < ActiveRecord::Base
   def send_helper_no_reply_messages
     helper = member
     helper_message = Member::Message.new(helper)
-    helper_message_strings = helper_message.current_helper_no_reply_messages(activity_args)
+    helper_message_strings = helper_message.current_helper_no_reply_messages(no_reply_args)
     send_sms(helper_message_strings, helper)
     helper.increment_helper_no_reply_count!
     mark_no_reply_sent!
@@ -161,7 +161,7 @@ class Reminder < ActiveRecord::Base
 
   def send_both_no_reply_messages
     member_message = Member::Message.new(member)
-    member_message_strings = member_message.current_both_no_reply_messages(activity_args)
+    member_message_strings = member_message.current_both_no_reply_messages(no_reply_args)
     send_sms member_message_strings
     member.increment_both_no_reply_count!
     mark_no_reply_sent!
@@ -178,6 +178,28 @@ class Reminder < ActiveRecord::Base
   def activity_args
     Tandem::Message.activity_tenses(pair.activity)
   end
+
+  # TODO: unit tests
+  def no_reply_args
+    doer                  = checkin.member
+    helper                = checkin.other_member
+    doer_first_name       = doer.first_name
+    helper_first_name     = helper.first_name
+    doer_pronouns         = Tandem::Message.gender_pronouns(doer.gender)
+    helper_pronouns       = Tandem::Message.gender_pronouns(helper.gender)
+    doer_pronoun_object   = doer_pronouns[:pronoun_object]
+    doer_pronoun_subject  = doer_pronouns[:pronoun_subbject]
+    helper_pronoun_object = helper_pronouns[:pronoun_object]
+
+    activity_args.merge(
+      doer_first_name: doer_first_name,
+      doer_pronoun_object: doer_pronoun_object,
+      doer_pronoun_subject: doer_pronoun_subject,
+      helper_first_name: helper_first_name,
+      helper_pronoun_object: helper_pronoun_object,
+    )
+  end
+
 
   # TODO: unit tests
   def no_reply_sent?
