@@ -45,7 +45,7 @@ class MembersController < ApplicationController
       format.html {
         return render :new unless @member
         # TODO: internationalize
-        redirect_to(group_members_path(@group), notice: "Member was successfully created.")
+        redirect_to(@group ? group_members_path(@group) : members_path, notice: "Member was successfully created.")
       }
 
       format.json {
@@ -95,8 +95,10 @@ class MembersController < ApplicationController
   # PATCH/PUT /members/1
   # PATCH/PUT /members/1.json
   def update
+
     respond_to do |format|
       if @member.update(member_params)
+        GroupMembership.find_or_create_by(group: @group, member: @member)
         # TODO: internationalize
         format.html { redirect_to @group ? group_members_path(@group) : members_path, notice: "Member was successfully updated." }
         format.json { render :show, status: :ok, location: @member }
@@ -132,7 +134,7 @@ class MembersController < ApplicationController
 
   # Never trust parameters from the scary internet, only allow the white list through.
   def member_params
-    params.require(:member).permit(:name, :phone_number, :active, :time_zone)
+    params.require(:member).permit(:name, :phone_number, :active, :time_zone, :gender)
   end
 
   def create_member_and_membership member_params

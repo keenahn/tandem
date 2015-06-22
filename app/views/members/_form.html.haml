@@ -1,10 +1,20 @@
 = form_for @member, html: { class: "form-horizontal form-model" } do |f|
-  = hidden_field_tag :group_id, @group ? @group.id : nil
+  - if @group
+    = hidden_field_tag :group_id, @group.id
+  - else
+  .form-group
+    = label_tag :group_id, nil, class: "control-label col-md-2"
+    .col-md-10
+      = select_tag "group_id", options_from_collection_for_select(current_user.groups, :id, :name, selected: @group.try(:id)), { class: "select2" }
 
   .form-group
     = f.label :name, class: "control-label col-md-2"
     .col-md-10
       = f.text_field :name, class: "text-field form-control"
+  .form-group
+    = f.label :gender, class: "control-label col-md-2"
+    .col-md-10
+      = collection_select :member, :gender, Member.genders.keys, :to_s, :to_s, {}, { class: "select2" }
   .form-group
     = f.label :phone_number, class: "control-label col-md-2"
     .col-md-10
