@@ -14,6 +14,12 @@ module Clockwork
     CreateCheckinsAndRemindersJob.perform_later
   }
 
+  every(15.minute, "Ping homepage"){
+    HTTParty.get("http://tandemstaging.herokuapp.com")
+  }
+
+
+
   #
   # DEFAULT_WINDOW  = 5
 
