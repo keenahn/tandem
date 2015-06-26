@@ -53,7 +53,7 @@ class SmsController < ApplicationController
 
   def handle_pass_through member, pair, body
     other_member = pair.other_member(member)
-    body = "#{other_member.first_name}: #{body}"
+    body = "#{member.first_name}: #{body}"
     p = { from: member, to: other_member, message: body }
     Sms.create_and_send(p)
     render_nothing
