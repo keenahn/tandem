@@ -97,7 +97,7 @@ class Reminder < ActiveRecord::Base
     #   1. If the checkin is still not marked as done AND
     #   2. it is no_reply_minutes minutes AFTER the last sent reminder
 
-    Pair.where(id: pair_ids).includes(:member_1, :member_2).each do |pair|
+    Pair.active.where(id: pair_ids).includes(:member_1, :member_2).each do |pair|
       member_1 = pair.member_1
       member_2 = pair.member_2
 
@@ -153,7 +153,7 @@ class Reminder < ActiveRecord::Base
   def send_helper_no_reply_messages
     helper = member
     helper_message = Member::Message.new(helper)
-    helper_message_strings = helper_message.current_helper_no_reply_messages(no_reply_args)
+    helper_message_strings = helper_message.current_helper_no_reply_messages(no_reply_args(true))
     send_sms(helper_message_strings, helper)
     helper.increment_helper_no_reply_count!
     mark_no_reply_sent!
@@ -180,9 +180,14 @@ class Reminder < ActiveRecord::Base
   end
 
   # TODO: unit tests
-  def no_reply_args
-    doer                  = checkin.member
-    helper                = checkin.other_member
+  def no_reply_args to_helper = false
+    if to_helper
+      doer = checkin.other_member
+      helper = checkin.member
+    else
+      doer = checkin.member
+      helper = checkin.other_member
+    end
     doer_first_name       = doer.first_name
     helper_first_name     = helper.first_name
     doer_pronouns         = Tandem::Message.gender_pronouns(doer.gender)
