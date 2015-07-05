@@ -51,6 +51,7 @@ class SmsController < ApplicationController
     render nothing: true, status: 200, content_type: "text/html"
   end
 
+  # Passing through FROM member TO other_member
   def handle_pass_through member, pair, body
     other_member = pair.other_member(member)
     body = "#{member.first_name}: #{body}"

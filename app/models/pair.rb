@@ -75,13 +75,13 @@ class Pair < ActiveRecord::Base
     set_defaults
   end
 
-  after_save(on: :create) do
-    send_welcome_messages
-  end
-
   after_save do
     update_checkins_reminders
     update_group_memberships
+  end
+
+  after_save do
+    send_welcome_messages if active? && changes[:active]
   end
 
   ##############################################################################
@@ -189,7 +189,6 @@ class Pair < ActiveRecord::Base
 
   # TODO: unit tests
   def set_defaults
-    self.active          = true
     self.tandem_number   ||= Phoner::Phone.parse(TwilioClient::DEFAULT_FROM_NUMBER + "").to_s
     if group
       self.activity      ||= group.activity
