@@ -252,8 +252,5 @@ RSpec.describe Reminder, type: :model do
       # TODO
     end
 
-
-
   end
-
 end

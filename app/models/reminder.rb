@@ -23,7 +23,7 @@ class Reminder < ActiveRecord::Base
   NO_REPLY_MINUTES = 10
 
   # How often we'll be sending the no_reply messages
-  NO_REPLY_WINDOW = 5
+  NO_REPLY_WINDOW = 3 # 5
 
 
   ##############################################################################

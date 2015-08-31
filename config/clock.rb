@@ -16,7 +16,7 @@ module Clockwork
 
 
   # This is a hack for Heroku to keep the free dyno awake
-  every(15.minute, "Ping homepage"){
+  every(5.minute, "Ping homepage"){
     HTTParty.get("http://tandemstaging.herokuapp.com")
   }
 
