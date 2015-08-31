@@ -33,7 +33,6 @@ class SmsController < ApplicationController
     message = Sms.create(from: member, to: pair, message: body)
 
     if checkin
-
       if matches_yes?(body)
         return handle_yes(checkin) if member.local_time >= checkin.pair.reminder_time_today_utc
       end

@@ -231,11 +231,17 @@ class Pair < ActiveRecord::Base
 
   def welcome_message_args mem
     partner = other_member(mem)
+
+    t = Tandem::Utils.parse_time_in_zone(
+          "#{local_date} #{reminder_time}",
+          time_zone
+        ).in_time_zone(mem.time_zone)
+
     Tandem::Message.activity_tenses(activity).merge(
       product_name: I18n.t("tandem.general.product_name"),
       member_first_name: mem.first_name,
       partner_first_name: partner.first_name,
-      display_time: Tandem::Utils.short_time(reminder_time),
+      display_time: Tandem::Utils.short_time(t)
     )
   end
 
