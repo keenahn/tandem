@@ -33,7 +33,10 @@ class SmsController < ApplicationController
     message = Sms.create(from: member, to: pair, message: body)
 
     if checkin
-      return handle_yes(checkin)              if matches_yes?(body)
+
+      if matches_yes?(body)
+        return handle_yes(checkin) if member.local_time >= checkin.pair.reminder_time_today_utc
+      end
       return handle_reschedule(checkin, body) if matches_reschedule?(body)
       return handle_am_pm                     if matches_am_pm?(body)
     end

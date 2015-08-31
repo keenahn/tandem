@@ -168,6 +168,11 @@ class Pair < ActiveRecord::Base
     Tandem::Utils.short_time_24(self[sym])
   end
 
+  # Alias
+  def reminder_time_today_utc
+    next_reminder_time_utc
+  end
+
   def next_reminder_time_utc
     Tandem::Utils.parse_time_in_zone("#{local_date} #{reminder_time_today}", time_zone).utc
   end
