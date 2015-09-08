@@ -9,8 +9,11 @@ module Concerns
       Pair.active.each{|p|
         # TODO: figure out a way to be safe but also more efficient
         # Perhaps run only on ones that are within an hour or two
-        next unless p.local_time.hour == 0 # Run right after midnight, locally
-        p.create_checkin_and_reminders
+        p.members.each{|m|
+          next unless m.local_time.hour == 0 # Run right after midnight, locally
+          m.create_checkin_and_reminders(p)
+        }
+
       }
     end
 
