@@ -11,7 +11,7 @@ module Concerns
         # Perhaps run only on ones that are within an hour or two
         p.members.each{|m|
           next unless m.local_time.hour == 0 # Run right after midnight, locally
-          m.create_checkin_and_reminders(p)
+          m.create_checkin_and_reminder(p)
         }
 
       }

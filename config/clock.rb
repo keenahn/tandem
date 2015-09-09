@@ -10,7 +10,7 @@ module Clockwork
     puts "Handling #{job} at #{time}"
   end
 
-  every(1.hour, "Create Empty Checkins", at: "**:02"){
+  every(1.hour, "Create Empty Checkins", at: "**:03"){
     CreateCheckinsAndRemindersJob.perform_later
   }
 
