@@ -34,7 +34,10 @@ class SmsController < ApplicationController
 
     if checkin
       if matches_yes?(body)
-        return handle_yes(checkin) if member.local_time >= checkin.pair.reminder_time_today_utc
+        reminder = checkin.reminder
+        good_time = member.local_time >= reminder.local_last_reminder_time &&
+                    member.local_date == reminder.local_last_reminder_date
+        return handle_yes(checkin) if good_time
       end
       return handle_reschedule(checkin, body) if matches_reschedule?(body)
       return handle_am_pm                     if matches_am_pm?(body)

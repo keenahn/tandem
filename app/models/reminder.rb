@@ -250,6 +250,14 @@ class Reminder < ActiveRecord::Base
     checkin && checkin.done?
   end
 
+  def local_last_reminder_time
+    last_reminder_time_utc.in_time_zone(member.time_zone)
+  end
+
+  def local_last_reminder_date
+    local_last_reminder_time.to_date
+  end
+
   # TODO: unit tests
   def to_s
     "Reminder: #{id} Pair: #{pair_id}, Member: #{member}, Status: #{status},
