@@ -35,9 +35,11 @@ class SmsController < ApplicationController
     if checkin
       if matches_yes?(body)
         reminder = checkin.reminder
-        good_time = member.local_time >= reminder.local_last_reminder_time &&
-                    member.local_date == reminder.local_last_reminder_date
-        return handle_yes(checkin) if good_time
+        if reminder.local_last_reminder_time
+          good_time = member.local_time >= reminder.local_last_reminder_time &&
+                      member.local_date == reminder.local_last_reminder_date
+          return handle_yes(checkin) if good_time
+        end
       end
       return handle_reschedule(checkin, body) if matches_reschedule?(body)
       return handle_am_pm                     if matches_am_pm?(body)
@@ -109,10 +111,10 @@ class SmsController < ApplicationController
     helper.increment_helper_yes_count!
   end
 
-  def get_reschedule_time reschedule_time_string, pair
-    local_date_string = pair.local_date.strftime(Tandem::Consts::DEFAULT_DATE_FORMAT)
+  def get_reschedule_time reschedule_time_string, member
+    local_date_string = member.local_date.strftime(Tandem::Consts::DEFAULT_DATE_FORMAT)
     reschedule_time_string = "#{local_date_string} #{reschedule_time_string}"
-    Tandem::Utils.parse_time_in_zone(reschedule_time_string, pair.time_zone)
+    Tandem::Utils.parse_time_in_zone(reschedule_time_string, member.time_zone)
   end
 
   # TODO: unit tests
@@ -121,8 +123,8 @@ class SmsController < ApplicationController
     reschedule_time_string = extract_time(body)
     return twiml(Tandem::Message.message_string("bad_time")) unless reschedule_time_string
 
-    pair = checkin.pair
-    reschedule_time = get_reschedule_time(reschedule_time_string, pair)
+    member = checkin.member
+    reschedule_time = get_reschedule_time(reschedule_time_string, member)
     return twiml(Tandem::Message.message_string("bad_time")) unless reschedule_time
 
     # This is the most complex part of this function, and it's not easily refactored
@@ -135,12 +137,12 @@ class SmsController < ApplicationController
         reschedule_time_string += " AM"
       end
       meridiem_set = body_down.include?("a") || body_down.include?("p")
-      reschedule_time = get_reschedule_time(reschedule_time_string, pair) if meridiem_set
+      reschedule_time = get_reschedule_time(reschedule_time_string, member) if meridiem_set
     else
       meridiem_set = true
     end
 
-    local_time = pair.local_time
+    local_time = member.local_time
 
     if meridiem_set
       return reschedule_and_notify(checkin, reschedule_time) if local_time < reschedule_time
@@ -152,7 +154,7 @@ class SmsController < ApplicationController
     if local_time > reschedule_time
       # When interpreted as AM, the time is past, so try it with forced PM
       reschedule_time_string += " PM"
-      reschedule_time = get_reschedule_time(reschedule_time_string, pair)
+      reschedule_time = get_reschedule_time(reschedule_time_string, member)
 
       # Rescheduling when forcing PM is also after current time, so they gave an impossible time
       return twiml(Tandem::Message.message_string("reschedule_too_late")) if local_time > reschedule_time
@@ -248,7 +250,7 @@ class SmsController < ApplicationController
 
   # TODO: unit tests
   def matches_yes? s
-    /\b(yes|yeah|ok)/i =~ s ? true : false
+    /\b(yes)/i =~ s ? true : false
   end
 
   # TODO: unit tests

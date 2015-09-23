@@ -251,7 +251,8 @@ class Reminder < ActiveRecord::Base
   end
 
   def local_last_reminder_time
-    last_reminder_time_utc.in_time_zone(member.time_zone)
+    return last_reminder_time_utc.in_time_zone(member.time_zone) if last_reminder_time_utc
+    nil
   end
 
   def local_last_reminder_date

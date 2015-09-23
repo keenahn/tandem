@@ -69,19 +69,55 @@ describe SmsController do
     let(:pair)     { FactoryGirl.create(:pair)   }
     let(:member)   { pair.member_1               }
 
-    it "should handle_yes when matches_yes? yes" do
+    it "should handle_yes when matches_yes?" do
+      pair.create_checkin_and_reminders
       params = {
         "From"  => member.phone_number,
         "To"    => pair.tandem_number,
         "Body"  => "Yes, doing it now!",
         "extra" => "Doesn't matter"
       }
-      # checkin = FactoryGirl.create(:checkin, pair: pair, member: member)
-      expect_and_call_original :handle_yes
-      expect(response.status).to eq(200)
-      post(:receive, params)
+
+      Timecop.travel(pair.reminder_time_today_utc) do
+        pair.reminders.each{|r|
+          r.mark_sent!
+        }
+      end
+
+      Timecop.travel(pair.reminder_time_today_utc + 5.minute) do
+        expect_and_call_original :handle_yes
+        expect(response.status).to eq(200)
+        post(:receive, params)
+      end
     end
+
+    it "should pass through when matches_yes? but before reminder time" do
+      pair.create_checkin_and_reminders
+      params = {
+        "From"  => member.phone_number,
+        "To"    => pair.tandem_number,
+        "Body"  => "Yes, doing it now!",
+        "extra" => "Doesn't matter"
+      }
+
+      Timecop.travel(pair.reminder_time_today_utc) do
+        pair.reminders.each{|r|
+          r.mark_sent!
+        }
+      end
+
+      Timecop.travel(pair.reminder_time_today_utc - 5.minute) do
+        expect_and_call_original :handle_pass_through
+        expect(response.status).to eq(200)
+        post(:receive, params)
+      end
+    end
+
+
+
   end # close with checkin
+
+
 
   describe "should reschedule" do
     before :each do
