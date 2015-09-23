@@ -232,6 +232,7 @@ class Reminder < ActiveRecord::Base
 
   def reschedule utc_time
     self.next_reminder_time_utc = utc_time
+    self.last_reminder_time_utc = nil # So that we don't trigger "no reply" messages
     self.status = :unsent
     save
   end

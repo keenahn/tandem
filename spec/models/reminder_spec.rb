@@ -74,13 +74,15 @@ RSpec.describe Reminder, type: :model do
     end
 
     it "activity_args" do
-     act_args = {
+      act_args = {
         activity_infinitive: "to meditate",
         activity_noun: "meditation",
+        activity_noun_cap: "Meditation",
         activity_past: "meditated",
         activity_present_participle: "meditating",
         activity_short_noun: "'tate",
-        activity_simple_present: "meditate"
+        activity_simple_present: "meditate",
+        activity_simple_present_cap: "Meditate"
       }
 
       @pair_1.activity = "meditation"
@@ -123,6 +125,7 @@ RSpec.describe Reminder, type: :model do
 
       expect(@r.status).to eq("unsent")
       expect(@r.next_reminder_time_utc.to_i).to be_within(1).of(t.to_i)
+      expect(@r.last_reminder_time_utc).to be_nil
     end
 
     it "temp_reschedule" do
@@ -208,14 +211,14 @@ RSpec.describe Reminder, type: :model do
     end
 
     it "pair_ids_for_no_reply_messages for one" do
-      tnow = Time.now - 11.minute
+      tnow = Time.now - (Reminder::NO_REPLY_MINUTES + 1).minute
       Reminder.where(pair_id: @pair_1.id).update_all(status: 1, last_reminder_time_utc: tnow)
       pair_ids = Reminder.pair_ids_for_no_reply_messages
       expect(pair_ids).to eq([@pair_1.id])
     end
 
     it "pair_ids_for_no_reply_messages for multiple" do
-      tnow = Time.now - 11.minute
+      tnow = Time.now - (Reminder::NO_REPLY_MINUTES + 1).minute
       Reminder.where(pair_id: @pair_ids).update_all(status: 1, last_reminder_time_utc: tnow)
       pair_ids = Reminder.pair_ids_for_no_reply_messages
       expect(pair_ids).to eq([@pair_1.id, @pair_2.id])
@@ -229,7 +232,7 @@ RSpec.describe Reminder, type: :model do
     end
 
     it "pair_ids_for_no_reply_messages for inside window but unsent" do
-      tnow = Time.now - 11.minute
+      tnow = Time.now - (Reminder::NO_REPLY_MINUTES + 1).minute
       Reminder.where(pair_id: @pair_ids).update_all(status: 0, last_reminder_time_utc: tnow)
       pair_ids = Reminder.pair_ids_for_no_reply_messages
       expect(pair_ids).to eq([])
@@ -238,19 +241,37 @@ RSpec.describe Reminder, type: :model do
 
 
     it "sent no reply messages when time was correct" do
-      tnow = Time.now - 11.minute
+      tnow = Time.now - (Reminder::NO_REPLY_MINUTES + 1).minute
       Reminder.where(pair_id: @pair_1.id).update_all(status: 1, last_reminder_time_utc: tnow)
 
-      # TODO
+      reminders = Reminder.where(pair_id: @pair_1.id)
+      r1 = reminders[0]
+      r2 = reminders[1]
 
       Reminder.send_no_reply_messages
+
+      r1.reload
+      r2.reload
+      expect(r1.last_no_reply_sent_time_utc.to_i).to be_within(1).of(Time.now.utc.to_i)
+      expect(r2.last_no_reply_sent_time_utc.to_i).to be_within(1).of(Time.now.utc.to_i)
     end
 
-    it "did not send no reply messages when time was correct" do
-      Timecop.travel(Time.now + 20.minute)
+    it "didn't send no reply messages when time is before no reply minutes" do
+      tnow = Time.now - (Reminder::NO_REPLY_MINUTES - 1).minute
+      Reminder.where(pair_id: @pair_1.id).update_all(status: 1, last_reminder_time_utc: tnow)
 
-      # TODO
+      reminders = Reminder.where(pair_id: @pair_1.id)
+      r1 = reminders[0]
+      r2 = reminders[1]
+
+      Reminder.send_no_reply_messages
+
+      r1.reload
+      r2.reload
+      expect(r1.last_no_reply_sent_time_utc).to be_nil
+      expect(r2.last_no_reply_sent_time_utc).to be_nil
     end
+
 
   end
 end
