@@ -294,8 +294,6 @@ RSpec.describe Reminder, type: :model do
       expect(pair_ids).to eq([])
     end
 
-
-
     it "sent no reply messages when time was correct" do
       tnow = Time.now - (Reminder::NO_REPLY_MINUTES + 1).minute
       Reminder.where(pair_id: @pair_1.id).update_all(status: 1, last_reminder_time_utc: tnow)
@@ -311,6 +309,53 @@ RSpec.describe Reminder, type: :model do
       expect(r1.last_no_reply_sent_time_utc.to_i).to be_within(1).of(Time.now.utc.to_i)
       expect(r2.last_no_reply_sent_time_utc.to_i).to be_within(1).of(Time.now.utc.to_i)
     end
+
+
+    it "sent one way no reply when one member rescheduled" do
+
+      tnow = Time.now - (Reminder::NO_REPLY_MINUTES + 1).minute
+      Reminder.update_all(status: 1, last_reminder_time_utc: tnow)
+      @m.reminders.update_all(last_reminder_time_utc: Time.now - 2.hour)
+
+      unsent_count_1 = Reminder.unsent.count
+      sent_count_1   = Reminder.sent.count
+
+      Reminder.send_no_reply_messages
+
+      @r  = Reminder.find @r.id
+      @r2 = Reminder.find @r2.id
+      @r3 = Reminder.find @r3.id
+      @r4 = Reminder.find @r4.id
+
+      expect(@r2.last_no_reply_sent_time_utc.to_i).to be_within(1).of(Time.now.utc.to_i)
+      expect(@r4.last_no_reply_sent_time_utc.to_i).to be_within(1).of(Time.now.utc.to_i)
+      expect(@r.last_no_reply_sent_time_utc).to be_nil
+      expect(@r3.last_no_reply_sent_time_utc).to be_nil
+    end
+
+    # TODO: DRY with above
+    it "sent one way no reply when one member checked in" do
+
+      tnow = Time.now - (Reminder::NO_REPLY_MINUTES + 1).minute
+      Reminder.update_all(status: 1, last_reminder_time_utc: tnow)
+      @m.checkins.update_all(done_at: Time.now - 2.hour)
+
+      unsent_count_1 = Reminder.unsent.count
+      sent_count_1   = Reminder.sent.count
+
+      Reminder.send_no_reply_messages
+
+      @r  = Reminder.find @r.id
+      @r2 = Reminder.find @r2.id
+      @r3 = Reminder.find @r3.id
+      @r4 = Reminder.find @r4.id
+
+      expect(@r2.last_no_reply_sent_time_utc.to_i).to be_within(1).of(Time.now.utc.to_i)
+      expect(@r4.last_no_reply_sent_time_utc.to_i).to be_within(1).of(Time.now.utc.to_i)
+      expect(@r.last_no_reply_sent_time_utc).to be_nil
+      expect(@r3.last_no_reply_sent_time_utc).to be_nil
+    end
+
 
     it "didn't send no reply messages when time is before no reply minutes" do
       tnow = Time.now - (Reminder::NO_REPLY_MINUTES - 1).minute

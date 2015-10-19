@@ -74,16 +74,7 @@ class Reminder < ActiveRecord::Base
   # CLASS METHODS
   ##############################################################################
 
-  # def self.send_reminders window = DEFAULT_WINDOW
-  #   time_range = (Time.now - window.minutes)..Time.now
-  #   Reminder.unsent.where(next_reminder_time_utc: time_range).each{ |x|
-  #     next if x.checkin_done? # don't send reminders if the user checked in EARLY
-  #     x.send_reminder
-  #   }
-  # end
-
-
-  # TODO: unit tests
+  # TODO: DRY with no reply function
   def self.send_reminders window = DEFAULT_WINDOW
     pair_ids = pair_ids_for_reminder_messages(window)
     Pair.active.where(id: pair_ids).includes(:member_1, :member_2).each do |pair|
@@ -127,9 +118,6 @@ class Reminder < ActiveRecord::Base
     end
   end
 
-
-
-
   # TODO: unit tests
   def self.pair_ids_for_reminder_messages window = DEFAULT_WINDOW
     time_range = (Time.now - window.minutes)..Time.now
@@ -165,22 +153,29 @@ class Reminder < ActiveRecord::Base
       # If one user rescheduled, it actually becomes a "one-way" relationship temporarily
       # if r1.current? && r2.current?
 
-
-      if c1.try(:done?)
-        if !c2.try(:done?)
-          r1.send_helper_no_reply_messages
-          r2.send_doer_no_reply_messages
+      if r1.current? && r2.current?
+        if c1.try(:done?)
+          if !c2.try(:done?)
+            r1.send_helper_no_reply_messages
+            r2.send_doer_no_reply_messages
+          end
+        else # !c1.done?
+          if c2.try(:done?)
+            r1.send_doer_no_reply_messages
+            r2.send_helper_no_reply_messages
+          else
+            r1.send_both_no_reply_messages
+            r2.send_both_no_reply_messages
+          end
         end
-      else # !c1.done?
-        if c2.try(:done?)
-          r1.send_doer_no_reply_messages
-          r2.send_helper_no_reply_messages
-        else
-          r1.send_both_no_reply_messages
-          r2.send_both_no_reply_messages
-        end
+      elsif r1.current?
+        next if c1.try(:done?)
+        r1.send_doer_no_reply_messages
+        r2.send_helper_no_reply_messages
+      elsif r2.current?
+        r1.send_helper_no_reply_messages
+        r2.send_doer_no_reply_messages
       end
-
     end
   end
 
@@ -240,7 +235,7 @@ class Reminder < ActiveRecord::Base
     helper_message_strings = helper_message.current_helper_no_reply_messages(reminder_and_no_reply_args(true))
     send_sms(helper_message_strings, helper)
     helper.increment_helper_no_reply_count!
-    mark_no_reply_sent!
+    # mark_no_reply_sent!
   end
 
   def send_both_no_reply_messages
@@ -359,12 +354,12 @@ class Reminder < ActiveRecord::Base
     tnow = Time.now
     return true if last_reminder_time_utc &&
       last_reminder_time_utc < tnow &&
-      last_reminder_time_utc >= tnow - NO_REPLY_MINUTES.minutes
+      last_reminder_time_utc >= tnow - NO_REPLY_MINUTES.minutes - NO_REPLY_WINDOW.minutes
 
     # It's a new reminder that is about to be sent
     return true if !last_reminder_time_utc &&
       next_reminder_time_utc < tnow &&
-      next_reminder_time_utc >= tnow - NO_REPLY_MINUTES.minutes
+      next_reminder_time_utc >= tnow - NO_REPLY_MINUTES.minutes - NO_REPLY_WINDOW.minutes
 
     false
   end
