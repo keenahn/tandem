@@ -67,6 +67,7 @@ class Member < ActiveRecord::Base
   has_many :groups, through: :group_memberships
   has_many :group_memberships, dependent: :destroy
   has_many :checkins, dependent: :destroy
+  has_many :reminders, dependent: :destroy
 
   ##############################################################################
   # VALIDATIONS
@@ -308,6 +309,37 @@ class Member < ActiveRecord::Base
   # Does save
   def increment_helper_no_reply_count!
     increment_helper_no_reply_count
+    save
+  end
+
+  # TODO: unit tests
+  # Doesn't save
+  def increment_doer_reminder_count
+    increment_reminder_count
+  end
+
+  # TODO: unit tests
+  # Does save
+  def increment_doer_reminder_count!
+    increment_doer_reminder_count
+    save
+  end
+
+  # TODO: unit tests
+  # Doesn't save
+  def increment_helper_reminder_count
+    return true if seen_second_other_reminder?
+    if seen_first_other_reminder?
+      self.seen_second_other_reminder = true
+    else
+      self.seen_first_other_reminder  = true
+    end
+  end
+
+  # TODO: unit tests
+  # Does save
+  def increment_helper_reminder_count!
+    increment_helper_reminder_count
     save
   end
 

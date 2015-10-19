@@ -13,21 +13,24 @@ RSpec.describe Reminder, type: :model do
   describe "tests" do
     before :each do
       @m = FactoryGirl.create(:member)
+      @pair_1 = FactoryGirl.create(:pair, {member_1: @m})
+      @pair_2 = FactoryGirl.create(:pair, {member_2: @m})
 
-      tnow = Time.now - 2.minute
+      tnow = Time.now.in_time_zone(@pair_1.group.time_zone) - Reminder::DEFAULT_WINDOW.minute + 1.minute
 
       pair_args = {
-        reminder_time_mon: tnow,
-        reminder_time_tue: tnow,
-        reminder_time_wed: tnow,
-        reminder_time_thu: tnow,
-        reminder_time_fri: tnow,
-        reminder_time_sat: tnow,
-        reminder_time_sun: tnow
+        reminder_time_mon:  tnow.strftime(Tandem::Consts::SHORT_TIME_24_FORMAT),
+        reminder_time_tue:  tnow.strftime(Tandem::Consts::SHORT_TIME_24_FORMAT),
+        reminder_time_wed:  tnow.strftime(Tandem::Consts::SHORT_TIME_24_FORMAT),
+        reminder_time_thu:  tnow.strftime(Tandem::Consts::SHORT_TIME_24_FORMAT),
+        reminder_time_fri:  tnow.strftime(Tandem::Consts::SHORT_TIME_24_FORMAT),
+        reminder_time_sat:  tnow.strftime(Tandem::Consts::SHORT_TIME_24_FORMAT),
+        reminder_time_sun:  tnow.strftime(Tandem::Consts::SHORT_TIME_24_FORMAT)
       }
 
-      @pair_1 = FactoryGirl.create(:pair, pair_args.merge(member_1: @m))
-      @pair_2 = FactoryGirl.create(:pair, pair_args.merge(member_2: @m))
+      @pair_1.update_attributes(pair_args)
+      @pair_2.update_attributes(pair_args)
+
       @inactive_pair = FactoryGirl.create(:pair,  pair_args.merge(member_2: @m, active: false))
       @pair_ids = @m.pairs.pluck(:id).sort
 
@@ -40,7 +43,9 @@ RSpec.describe Reminder, type: :model do
       }
 
       @r = Reminder.find_by(pair_id: @pair_1.id, member_id: @m.id)
-
+      @r2 = Reminder.where(pair_id: @pair_1.id).where("member_id <> ?", @m.id).first
+      @r3 = Reminder.find_by(pair_id: @pair_2.id, member_id: @m.id)
+      @r4 = Reminder.where(pair_id: @pair_2.id).where("member_id <> ?", @m.id).first
       # TODO: move some of this stuff to a reminder_factory
     end
 
@@ -49,12 +54,63 @@ RSpec.describe Reminder, type: :model do
       sent_count_1   = Reminder.sent.count
 
       Reminder.send_reminders
-
       unsent_count_2 = Reminder.unsent.count
       sent_count_2   = Reminder.sent.count
 
       expect(unsent_count_2).to equal(unsent_count_1 - 4)
       expect(sent_count_2).to equal(sent_count_1 + 4)
+    end
+
+    it "sent one way reminders when one member was done" do
+      @m.checkins.update_all(done_at: Time.now - 5.minute)
+      unsent_count_1 = Reminder.unsent.count
+      sent_count_1   = Reminder.sent.count
+
+      Reminder.send_reminders
+
+      @r  = Reminder.find @r.id
+      @r2 = Reminder.find @r2.id
+      @r3 = Reminder.find @r3.id
+      @r4 = Reminder.find @r4.id
+
+      # puts @r
+      # puts @r2
+      # puts @r3
+      # puts @r4
+
+      unsent_count_2 = Reminder.unsent.count
+      sent_count_2   = Reminder.sent.count
+
+      expect(unsent_count_2).to equal(unsent_count_1 - 2)
+      expect(sent_count_2).to equal(sent_count_1 + 2)
+    end
+
+    it "sent one way reminders when one member rescheduled" do
+      @m.reminders.update_all(next_reminder_time_utc: Time.now + 2.hour)
+
+      unsent_count_1 = Reminder.unsent.count
+      sent_count_1   = Reminder.sent.count
+
+      Reminder.send_reminders
+
+      @r  = Reminder.find @r.id
+      @r2 = Reminder.find @r2.id
+      @r3 = Reminder.find @r3.id
+      @r4 = Reminder.find @r4.id
+
+      puts @r
+      puts @r2
+      puts @r3
+      puts @r4
+
+      # puts Reminder.unsent.inspect
+      # puts Reminder.sent.inspect
+
+      unsent_count_2 = Reminder.unsent.count
+      sent_count_2   = Reminder.sent.count
+
+      expect(unsent_count_2).to equal(unsent_count_1 - 2)
+      expect(sent_count_2).to equal(sent_count_1 + 2)
     end
 
     it "did not send reminders when time was correct" do

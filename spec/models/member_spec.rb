@@ -3,6 +3,8 @@ require "spec_helper"
 describe Member do
   it { should have_many(:groups).through(:group_memberships) }
   it { should have_many(:group_memberships).dependent(:destroy) }
+  it { should have_many(:checkins).dependent(:destroy) }
+  it { should have_many(:reminders).dependent(:destroy) }
   it { should respond_to(:time_zone) }
 
   it ".to_s" do

@@ -16,6 +16,8 @@
         login: "Login",
         signup: "Sign Up",
         product_name: "Tandem",
+        is: "is",
+        are: "are"
       },
       errors: {
         no_from_number_provided: "No 'From' number provided",

@@ -87,7 +87,7 @@ class TandemStrings
               "%{activity_noun_cap} is proven to make you 64% sexier. Get on it. %{helper_first_name} %{is_are} looking -- reply 'yes' and get to it! You can also send messages.",
               "%{activity_noun_cap} is proven to make you 64% sexier. Get on it. %{helper_first_name} %{is_are} looking -- reply 'yes' and get to it! You can send messages too.",
               "%{activity_noun_cap} is proven to make you 64% sexier. Get on it. %{helper_first_name} %{is_are} looking -- reply 'yes' and get to it!",
-              "%{activity_noun_cap} is proven to make you 64% sexier. Get on it. Blow %{helper_first_name}'s %{mind} -- reply 'yes' to tell %{helper_pronoun_object} you started!",
+              "%{activity_noun_cap} is proven to make you 64% sexier. Get on it. Blow %{helper_first_name}'s mind -- reply 'yes' to tell %{helper_pronoun_object} you started!",
               "%{activity_noun_cap} is proven to make you 64% sexier. Get on it. Don't keep %{helper_first_name} in suspense -- reply 'yes' and get started!",
               "%{activity_noun_cap} is proven to make you 64% sexier. Get on it. Reply 'yes' to let %{helper_first_name} know you started. You can also send messages.",
               "%{activity_noun_cap} is proven to make you 64% sexier. Get on it. Reply 'yes' to let %{helper_first_name} know you started. You can message %{helper_first_name} too.",
@@ -438,7 +438,7 @@ class TandemStrings
               "You know what time it is. %{activity_noun_cap} time. Reply 'yes' to tell %{helper_first_name} you're starting. You can send messages too.",
             ],
             reminder_one_way_doer_second_time: "%{activity_noun} time! %{helper_first_name} %{is_are} checking you out -- reply 'yes' within 10 minutes so %{helper_pronoun_subject}'ll know you started. You can also reschedule ('reschedule X:XX am').\nBTW, you can always send %{helper_first_name} a message.",
-            reminder_one_way_helper: "Time for %{doer_first_name} to %{activity_name}! %{doer_pronoun_subject} knows you're looking. We'll let you know within 10 min if %{doer_pronoun_subject} started. You can encourage %{doer_him_her} by replying to this text!",
+            reminder_one_way_helper: "Time for %{doer_first_name} to %{activity_name}! %{doer_pronoun_subject} knows you're looking. We'll let you know within 10 min if %{doer_pronoun_subject} started. You can encourage %{doer_pronoun_object} by replying to this text!",
             reminder_one_way_helper_first_time: "Time for %{doer_first_name} %{activity_infinitive}! %{doer_pronoun_subject} knows you're looking. We'll let you know within 10 min if %{doer_pronoun_subject} started. You can encourage %{doer_pronoun_object} by replying to this text!",
             reminder_one_way_helper_post_second_time: [
               "It's time for %{doer_first_name} %{activity_infinitive}! Cheer %{doer_pronoun_object} on!",
