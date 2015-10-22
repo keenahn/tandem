@@ -2,10 +2,10 @@
   = Pair.model_name.plural.capitalize
   - if @group
     %span.detail= "(#{Group.model_name}: #{@group.name})"
-  - elsif @pairs.any?
+  - elsif @pairs && @pairs.any?
     %span.detail= "(#{@pairs.count})"
 
-- if @pairs.any?
+- if @pairs && @pairs.any?
   %table.table.table-striped
     %thead
       %tr
