@@ -232,8 +232,10 @@ class Pair < ActiveRecord::Base
   def welcome_message_args mem
     partner = other_member(mem)
 
+    rtime = Tandem::Utils.short_time_24(reminder_time)
+
     t = Tandem::Utils.parse_time_in_zone(
-          "#{local_date} #{reminder_time}",
+          "#{local_date} #{rtime}",
           time_zone
         ).in_time_zone(mem.time_zone)
 

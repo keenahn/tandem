@@ -28,5 +28,27 @@ module Tandem
       t.strftime(Tandem::Consts::SHORT_TIME_24_FORMAT)
     end
 
+    def self.short_date d, timezone = DEFAULT_TIMEZONE
+      d.in_time_zone(timezone).strftime('%m/%d/%y')
+    end
+
+    def self.long_date d, timezone = DEFAULT_TIMEZONE
+      d.in_time_zone(timezone).strftime('%Y-%m-%d')
+    end
+
+    def self.text_date d, timezone = DEFAULT_TIMEZONE
+      d = d.in_time_zone(timezone)
+      d.strftime("%B #{d.day.ordinalize}, %Y")
+    end
+
+    def self.text_date_with_weekday d, timezone = DEFAULT_TIMEZONE
+      d = d.in_time_zone(timezone)
+      d.strftime("%A, %B #{d.day.ordinalize}")
+    end
+
+    def self.long_date_time d, timezone = DEFAULT_TIMEZONE
+      d.in_time_zone(timezone).strftime('%Y-%m-%d %H:%M:%S')
+    end
+
   end
 end
