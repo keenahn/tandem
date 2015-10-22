@@ -267,22 +267,27 @@ class Reminder < ActiveRecord::Base
       doer = member
       helper = other_member
     end
-    doer_first_name         = doer.first_name
-    helper_first_name       = helper.first_name
-    doer_pronouns           = Tandem::Message.gender_pronouns(doer.gender)
-    helper_pronouns         = Tandem::Message.gender_pronouns(helper.gender)
-    doer_pronoun_object     = doer_pronouns[:pronoun_object]
-    doer_pronoun_subject    = doer_pronouns[:pronoun_subject]
-    helper_pronoun_object   = helper_pronouns[:pronoun_object]
-    helper_pronoun_subject  = helper_pronouns[:pronoun_subject]
+    doer_first_name            = doer.first_name
+    helper_first_name          = helper.first_name
+    doer_pronouns              = Tandem::Message.gender_pronouns(doer.gender)
+    helper_pronouns            = Tandem::Message.gender_pronouns(helper.gender)
+    doer_pronoun_object        = doer_pronouns[:pronoun_object]
+    doer_pronoun_subject       = doer_pronouns[:pronoun_subject]
+    doer_pronoun_possessive    = doer_pronouns[:pronoun_possessive]
+    helper_pronoun_object      = helper_pronouns[:pronoun_object]
+    helper_pronoun_subject     = helper_pronouns[:pronoun_subject]
+    helper_pronoun_possessive  = helper_pronouns[:pronoun_possessive]
+
     is_are                  = I18n.t("tandem.general.is") # hardcoded for now
     activity_args.merge(
       doer_first_name: doer_first_name,
       doer_pronoun_object: doer_pronoun_object,
+      doer_pronoun_possessive: doer_pronoun_possessive,
       doer_pronoun_subject: doer_pronoun_subject,
       helper_first_name: helper_first_name,
       helper_pronoun_object: helper_pronoun_object,
       helper_pronoun_subject: helper_pronoun_subject,
+      helper_pronoun_possessive: helper_pronoun_possessive,
       is_are: is_are
     )
   end
