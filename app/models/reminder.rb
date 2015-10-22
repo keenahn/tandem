@@ -93,13 +93,13 @@ class Reminder < ActiveRecord::Base
       if r1.current? && r2.current?
         if c1.try(:done?)
           if !c2.try(:done?)
-            r1.send_helper_reminder
+            r2.send_helper_reminder
             r2.send_doer_reminder
           end
         else # !c1.done?
           if c2.try(:done?)
             r1.send_doer_reminder
-            r2.send_helper_reminder
+            r1.send_helper_reminder
           else
             r1.send_reminder
             r2.send_reminder
@@ -108,10 +108,10 @@ class Reminder < ActiveRecord::Base
       elsif r1.current?
         next if c1.try(:done?)
         r1.send_doer_reminder
-        r2.send_helper_reminder
+        r1.send_helper_reminder
       elsif r2.current?
         next if c2.try(:done?)
-        r1.send_helper_reminder
+        r2.send_helper_reminder
         r2.send_doer_reminder
       end
 
