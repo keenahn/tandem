@@ -357,14 +357,16 @@ class Reminder < ActiveRecord::Base
   # Returns true if this reminder is happening right now
   def current?
     tnow = Time.now
+
+    # It's a new reminder that is about to be sent
+    return true if  # !last_reminder_time_utc &&
+      next_reminder_time_utc < tnow &&
+      next_reminder_time_utc >= tnow - NO_REPLY_MINUTES.minutes - NO_REPLY_WINDOW.minutes
+
     return true if last_reminder_time_utc &&
       last_reminder_time_utc < tnow &&
       last_reminder_time_utc >= tnow - NO_REPLY_MINUTES.minutes - NO_REPLY_WINDOW.minutes
 
-    # It's a new reminder that is about to be sent
-    return true if !last_reminder_time_utc &&
-      next_reminder_time_utc < tnow &&
-      next_reminder_time_utc >= tnow - NO_REPLY_MINUTES.minutes - NO_REPLY_WINDOW.minutes
 
     false
   end
