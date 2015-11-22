@@ -27,8 +27,6 @@ pickle-email-*.html
 /ignore
 *.DS_Store
 **.DS_Store
-README
-README.md
 /public/assets/*
 /public/assets
 /public/cache
