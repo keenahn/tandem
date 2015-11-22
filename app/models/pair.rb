@@ -107,7 +107,7 @@ class Pair < ActiveRecord::Base
   }
 
   scope :owned_by, ->(user_id) {
-    gids_sql = Group.where(owner_id: 1).select(:id).to_sql
+    gids_sql = Group.where(owner_id: user_id).select(:id).to_sql
     Pair.where("#{table_name}.group_id IN (#{gids_sql})")
   }
 
