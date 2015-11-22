@@ -40,7 +40,7 @@ class GroupsController < ApplicationController
 
     respond_to do |format|
       if @group.save
-        format.html { redirect_to groups_path, notice: "Group was successfully created." }
+        format.html { redirect_to group_path(@group), notice: "Group was successfully created." }
         format.json { render :show, status: :created, location: @group }
       else
         format.html { render :new }
@@ -55,7 +55,7 @@ class GroupsController < ApplicationController
     authorize @group
     respond_to do |format|
       if @group.update(group_params)
-        format.html { redirect_to groups_path, notice: "Group was successfully updated." }
+        format.html { redirect_to group_path(@group), notice: "Group was successfully updated." }
         format.json { render :show, status: :ok, location: @group }
       else
         format.html { render :edit }

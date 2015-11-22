@@ -98,11 +98,6 @@ RSpec.describe Reminder, type: :model do
       @r3 = Reminder.find @r3.id
       @r4 = Reminder.find @r4.id
 
-      puts @r
-      puts @r2
-      puts @r3
-      puts @r4
-
       # puts Reminder.unsent.inspect
       # puts Reminder.sent.inspect
 
@@ -310,15 +305,16 @@ RSpec.describe Reminder, type: :model do
       expect(r2.last_no_reply_sent_time_utc.to_i).to be_within(1).of(Time.now.utc.to_i)
     end
 
-
     it "sent one way no reply when one member rescheduled" do
 
       tnow = Time.now - (Reminder::NO_REPLY_MINUTES + 1).minute
       Reminder.update_all(status: 1, last_reminder_time_utc: tnow)
       @m.reminders.update_all(last_reminder_time_utc: Time.now - 2.hour)
+      @m.reminders.update_all(next_reminder_time_utc: Time.now + 2.hour)
 
       unsent_count_1 = Reminder.unsent.count
       sent_count_1   = Reminder.sent.count
+
 
       Reminder.send_no_reply_messages
 
@@ -371,6 +367,13 @@ RSpec.describe Reminder, type: :model do
       r2.reload
       expect(r1.last_no_reply_sent_time_utc).to be_nil
       expect(r2.last_no_reply_sent_time_utc).to be_nil
+    end
+
+    it "reminder_and_no_reply_args" do
+      # TODO
+      expect(true)
+
+
     end
 
 
